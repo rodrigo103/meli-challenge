@@ -4,9 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.myandroidapp.data.Article
 import com.example.myandroidapp.data.ArticlesRepository
 import com.example.myandroidapp.test.MainDispatcherRule
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -15,56 +19,70 @@ class ArticleDetailViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    @Test
-    fun uiState_initiallyLoading() = runTest {
-        val viewModel = ArticleDetailViewModel(
-            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
-            repository = FakeDetailRepository(),
-        )
-        assertNotNull(viewModel.uiState.value)
-    }
+    private val article = Article(
+        id = 1, title = "Article Detail", summary = "Full summary",
+        newsSite = "NASA", publishedAt = "2026-05-15",
+    )
 
     @Test
-    fun loadArticle_onSuccess_populatesDetail() = runTest {
-        val repository = FakeDetailRepository()
+    fun `loadArticle on success populates detail`() = runTest {
+        val repository = mockk<ArticlesRepository>()
+        coEvery { repository.getArticle(1) } returns Result.success(article)
+
         val viewModel = ArticleDetailViewModel(
-            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
             repository = repository,
+            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertNotNull(viewModel.uiState.value.article)
-        assertEquals("Article Detail", viewModel.uiState.value.article?.title)
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertEquals("Article Detail", state.article?.title)
+        assertEquals(1, state.article?.id)
     }
 
     @Test
-    fun clearError_clearsErrorMessage() = runTest {
+    fun `loadArticle on failure sets error`() = runTest {
+        val repository = mockk<ArticlesRepository>()
+        coEvery { repository.getArticle(1) } returns Result.failure(Exception("Not found"))
+
         val viewModel = ArticleDetailViewModel(
+            repository = repository,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
-            repository = FakeDetailRepository(),
         )
+        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertNull(state.article)
+        assertEquals("Not found", state.error)
+    }
+
+    @Test
+    fun `clearError clears error message`() = runTest {
+        val repository = mockk<ArticlesRepository>()
+        coEvery { repository.getArticle(1) } returns Result.success(article)
+
+        val viewModel = ArticleDetailViewModel(
+            repository = repository,
+            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
+        )
+        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
+
         viewModel.clearError()
-        assertEquals(null, viewModel.uiState.value.error)
-    }
-}
-
-private class FakeDetailRepository : ArticlesRepository {
-    override suspend fun getArticles(limit: Int, offset: Int): Result<List<Article>> {
-        return Result.success(emptyList())
+        assertNull(viewModel.uiState.value.error)
     }
 
-    override suspend fun searchArticles(query: String, limit: Int): Result<List<Article>> {
-        return Result.success(emptyList())
-    }
+    @Test
+    fun `throws when articleId missing from savedStateHandle`() = runTest {
+        val repository = mockk<ArticlesRepository>()
 
-    override suspend fun getArticle(id: Int): Result<Article> {
-        return Result.success(
-            Article(
-                id = id,
-                title = "Article Detail",
-                summary = "Full summary",
-                newsSite = "NASA",
-                publishedAt = "2026-05-15",
-            ),
-        )
+        val exception = org.junit.Assert.assertThrows(IllegalStateException::class.java) {
+            ArticleDetailViewModel(
+                repository = repository,
+                savedStateHandle = SavedStateHandle(),
+            )
+        }
+        assertTrue(exception.message?.contains("articleId") == true)
     }
 }
