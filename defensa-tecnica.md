@@ -111,7 +111,13 @@ navigation3 es experimental y no está listo para producción. Tuve problemas co
 ```
 tests/
 ├── TestArticleData.kt          # Constantes de prueba compartidas
-├── test/MainDispatcherRule.kt   # Rule para coroutines
+├── TestJson.kt                 # Fixtures JSON para MockWebServer
+├── rules/
+│   ├── MainDispatcherRule.kt    # Rule para coroutines
+│   └── MockWebServerRule.kt    # Rule para servidor HTTP local
+├── data/
+│   ├── ApiServiceTest.kt       # 7 tests de integración HTTP
+│   └── ArticlesRepositoryTest.kt # 7 tests del pipeline completo
 ├── ui/articles/list/
 │   └── ArticlesListViewModelTest.kt  # 8 tests con MockK
 └── ui/articles/detail/
@@ -125,6 +131,18 @@ tests/
 - Búsqueda (replace de resultados)
 - Limpieza de estados (clearSearch, clearError)
 - Casos borde (SavedStateHandle sin articleId)
+
+**Tests unitarios vs de integración:**
+
+| Tipo | Herramienta | Qué verifica |
+|---|---|---|
+| Unitarios (ViewModel) | MockK | Comportamiento del ViewModel con mock del repository |
+| Integración HTTP | MockWebServer + Retrofit | Que el ApiService parsea bien el JSON, que el repository maneja HTTP codes |
+
+**Por qué MockWebServer:**
+
+- *"Mockea el servidor HTTP real. Retrofit le pega como si fuera la API de Space Flight News. Esto verifica que: 1) el endpoint está bien definido, 2) el JSON se serializa/deserializa correctamente, 3) los códigos HTTP de error se traducen a `Result.failure`."*
+- *"Los tests de `ArticlesRepositoryTest` prueban `extractBody()` con HTTP 200, 404, 500 y JSON malformado. Cualquier cambio en el contrato de la API rompe el test, no en producción."*
 
 **Por qué MockK y no Mockito:**
 
