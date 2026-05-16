@@ -545,6 +545,34 @@ Y en los módulos de use cases:
 
 **Para defender:** *"Usé TOML version catalog porque es la recomendación oficial de Gradle desde la 7.0. buildSrc era el estándar antes de que existieran los version catalogs y tiene ventajas como type-safety y custom logic, pero para un proyecto de 1 módulo con ~20 dependencias, TOML es más simple, más rápido y es lo que Google recomienda hoy."*
 
+### CoroutineDispatcher DI (injectable dispatchers)
+
+```kotlin
+@Module @InstallIn(SingletonComponent::class)
+object DispatcherModule {
+    @IoDispatcher @Provides
+    fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @DefaultDispatcher @Provides
+    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+}
+// uso: class MiRepo @Inject constructor(@IoDispatcher val io: CoroutineDispatcher)
+```
+
+**Para defender:** *"Este patrón permite inyectar dispatchers vía Hilt en vez de hardcodear `Dispatchers.IO` en el repository. En tests de integración, puedo reemplazar el módulo de Hilt para proveer `StandardTestDispatcher` en vez de `Dispatchers.IO`, eliminando la necesidad de `Dispatchers.setMain()`."*
+
+*"En este proyecto no lo apliqué a producción porque:*
+1. *Retrofit maneja su propio threading sobre OkHttp dispatcher. Agregar `withContext(IO)` es redundante.*
+2. *Los ViewModels usan `viewModelScope` que ya despacha en Main.*
+3. *No hay Room ni operaciones CPU-bound en el repository.*
+
+*Pero el módulo está declarado y listo para usar si el proyecto creciera. Es más: si mañana agrego Room, el `LocalDataSource` recibe `@IoDispatcher` sin tocar el ViewModel."*
+
+**Valor en entrevista:** Mostrar este patrón revela que:
+- Entendés que `Dispatchers.IO` acoplado al código es una dependencia oculta
+- Sabés que un repository testeable necesita que el dispatcher sea inyectable
+- Conocés `@Qualifier` de Dagger/Hilt y cómo crear anotaciones custom
+
 ---
 
 ## 8. Si pudieras volver a empezar, ¿qué harías diferente?
