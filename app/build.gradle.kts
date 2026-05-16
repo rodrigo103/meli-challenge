@@ -110,4 +110,10 @@ dependencies {
 
   // Timber
   implementation(libs.timber)
+
+  // SplashScreen
+  implementation(libs.androidx.core.splashscreen)
+
+  // Lottie
+  implementation(libs.lottie.compose)
 }

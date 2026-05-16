@@ -47,6 +47,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.myandroidapp.R
 import com.example.myandroidapp.data.Article
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,7 +116,12 @@ fun ArticlesListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator()
+                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
+                    LottieAnimation(
+                        composition = composition,
+                        modifier = Modifier.size(160.dp),
+                        iterations = LottieConstants.IterateForever,
+                    )
                 }
             } else if (state.articles.isEmpty() && !state.isLoading) {
                 Box(

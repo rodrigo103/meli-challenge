@@ -19,8 +19,10 @@ okhttp = "4.12.0"
 coil = "3.1.0"
 kotlinxSerializationJson = "1.8.1"
 mockk = "1.13.14"
+coreSplashscreen = "1.2.0"
 leakcanary = "2.14"
 timber = "5.0.1"
+lottie = "6.6.2"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -57,6 +59,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
