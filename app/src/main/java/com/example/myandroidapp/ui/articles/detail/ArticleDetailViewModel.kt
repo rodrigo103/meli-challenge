@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 data class ArticleDetailState(
@@ -33,10 +34,21 @@ class ArticleDetailViewModel @Inject constructor(
         loadArticle()
     }
 
+    companion object {
+        private const val REQUEST_TIMEOUT_MS = 30_000L
+    }
+
     fun loadArticle() {
         viewModelScope.launch {
             _uiState.update { UiState.Loading }
-            repository.getArticle(articleId)
+            val result = withTimeoutOrNull(REQUEST_TIMEOUT_MS) {
+                repository.getArticle(articleId)
+            }
+            if (result == null) {
+                _uiState.value = UiState.Error("Request timed out")
+                return@launch
+            }
+            result
                 .onSuccess { article ->
                     _uiState.value = UiState.Success(ArticleDetailState(article = article))
                 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 data class ArticlesListState(
@@ -62,7 +63,20 @@ class ArticlesListViewModel @Inject constructor(
                 _uiState.value = UiState.Loading
             }
             val offset = currentState?.offset ?: 0
-            repository.getArticles(offset = offset)
+            val result = withTimeoutOrNull(REQUEST_TIMEOUT_MS) {
+                repository.getArticles(offset = offset)
+            }
+            if (result == null) {
+                val existing = (_uiState.value as? UiState.Success)?.data
+                if (existing != null) {
+                    _uiState.value = UiState.Success(existing.copy(isLoadingMore = false))
+                    _events.emit(ArticlesListEvent.Error("Request timed out"))
+                } else {
+                    _uiState.value = UiState.Error("Request timed out")
+                }
+                return@launch
+            }
+            result
                 .onSuccess { articles ->
                     val existing = (_uiState.value as? UiState.Success)?.data
                     val merged = if (existing != null) {
@@ -103,7 +117,15 @@ class ArticlesListViewModel @Inject constructor(
             val current = (_uiState.value as? UiState.Success)?.data
                 ?: ArticlesListState()
             _uiState.value = UiState.Success(current.copy(isSearching = true))
-            repository.searchArticles(query)
+            val result = withTimeoutOrNull(REQUEST_TIMEOUT_MS) {
+                repository.searchArticles(query)
+            }
+            if (result == null) {
+                _uiState.value = UiState.Success(current.copy(isSearching = false))
+                _events.emit(ArticlesListEvent.Error("Request timed out"))
+                return@launch
+            }
+            result
                 .onSuccess { articles ->
                     _uiState.value = UiState.Success(
                         current.copy(
@@ -134,5 +156,6 @@ class ArticlesListViewModel @Inject constructor(
 
     companion object {
         private const val PAGE_SIZE = 20
+        private const val REQUEST_TIMEOUT_MS = 30_000L
     }
 }
