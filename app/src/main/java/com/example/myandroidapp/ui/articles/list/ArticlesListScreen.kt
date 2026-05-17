@@ -64,7 +64,7 @@ fun ArticlesListScreen(
 ) {
     val viewModel: ArticlesListViewModel = hiltViewModel()
     val articles = viewModel.articles.collectAsLazyPagingItems()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchDisplayQuery.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(articles.loadState) {
@@ -130,7 +130,7 @@ fun ArticlesListScreen(
                     SearchBar(
                         query = searchQuery,
                         onQueryChange = viewModel::onSearchQueryChanged,
-                        onSearch = {},
+                        onSearch = { viewModel.search(it) },
                         active = false,
                         onActiveChange = {},
                         placeholder = { Text("Search articles...") },

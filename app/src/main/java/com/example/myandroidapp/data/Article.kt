@@ -18,7 +18,18 @@ data class Article(
 @Serializable
 data class Author(
     val name: String? = null,
-    val socials: String? = null,
+    val socials: Socials? = null,
+)
+
+@Serializable
+data class Socials(
+    val x: String? = null,
+    val instagram: String? = null,
+    val facebook: String? = null,
+    val github: String? = null,
+    val linkedin: String? = null,
+    val mastodon: String? = null,
+    val bluesky: String? = null,
 )
 
 @Serializable

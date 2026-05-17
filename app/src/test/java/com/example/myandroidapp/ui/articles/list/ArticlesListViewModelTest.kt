@@ -1,13 +1,10 @@
 package com.example.myandroidapp.ui.articles.list
 
-import app.cash.turbine.test
-import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.analytics.AnalyticsHelper
 import com.example.myandroidapp.data.ArticlesRepository
 import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.test.MainDispatcherRule
 import androidx.paging.PagingData
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -25,7 +22,7 @@ class ArticlesListViewModelTest {
     private val preferences = mockk<AppPreferences>(relaxed = true)
 
     @Test
-    fun `onSearchQueryChanged updates query`() = runTest {
+    fun `onSearchQueryChanged updates display query`() = runTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
@@ -33,20 +30,20 @@ class ArticlesListViewModelTest {
 
         viewModel.onSearchQueryChanged("nasa")
 
-        assertEquals("nasa", viewModel.searchQuery.value)
+        assertEquals("nasa", viewModel.searchDisplayQuery.value)
     }
 
     @Test
-    fun `clearSearch resets query`() = runTest {
+    fun `clearSearch resets display query`() = runTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
         val viewModel = ArticlesListViewModel(repository, analytics, preferences)
 
-        viewModel.onSearchQueryChanged("nasa")
+        viewModel.search("nasa")
         viewModel.clearSearch()
 
-        assertEquals("", viewModel.searchQuery.value)
+        assertEquals("", viewModel.searchDisplayQuery.value)
     }
 
     @Test
