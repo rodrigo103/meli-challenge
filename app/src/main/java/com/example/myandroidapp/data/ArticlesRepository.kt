@@ -19,33 +19,22 @@ class DefaultArticlesRepository @Inject constructor(
 ) : ArticlesRepository {
     override suspend fun getArticles(limit: Int, offset: Int): Result<List<Article>> =
         runCatching {
-            val response = apiService.getArticles(limit = limit, offset = offset)
-            extractBody(response).results
+            apiService.getArticles(limit = limit, offset = offset).extractBody().results
         }.onFailure {
             Timber.e(it, "Error fetching articles")
         }
 
     override suspend fun searchArticles(query: String, limit: Int): Result<List<Article>> =
         runCatching {
-            val response =
-                apiService.getArticles(limit = limit, offset = 0, search = query)
-            extractBody(response).results
+            apiService.getArticles(limit = limit, offset = 0, search = query).extractBody().results
         }.onFailure {
             Timber.e(it, "Error searching articles with query: %s", query)
         }
 
     override suspend fun getArticle(id: Int): Result<Article> =
         runCatching {
-            val response = apiService.getArticle(id)
-            extractBody(response)
+            apiService.getArticle(id).extractBody()
         }.onFailure {
             Timber.e(it, "Error fetching article with id: %d", id)
         }
-
-    private fun <T> extractBody(response: retrofit2.Response<T>): T {
-        if (response.isSuccessful) {
-            return response.body()!!
-        }
-        throw IOException("HTTP ${response.code()} ${response.message()}")
-    }
 }

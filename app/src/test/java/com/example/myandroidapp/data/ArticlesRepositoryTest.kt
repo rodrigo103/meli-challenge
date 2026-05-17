@@ -54,7 +54,9 @@ class ArticlesRepositoryTest {
         assertTrue(result.isFailure)
         val error = result.exceptionOrNull()
         assertNotNull(error)
-        assertTrue(error!!.message?.contains("HTTP 500") == true)
+        assertTrue(error is ApiException.ServerError)
+        assertEquals(500, (error as ApiException.ServerError).code)
+        assertTrue(error.message?.contains("Internal error") == true)
     }
 
     @Test
@@ -64,7 +66,7 @@ class ArticlesRepositoryTest {
         val result = createRepository().getArticles()
 
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()!!.message?.contains("HTTP 404") == true)
+        assertTrue(result.exceptionOrNull()!!.message?.contains("Not found") == true)
     }
 
     @Test
@@ -84,7 +86,7 @@ class ArticlesRepositoryTest {
         val result = createRepository().getArticle(999)
 
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull()!!.message?.contains("HTTP 404") == true)
+        assertTrue(result.exceptionOrNull()!!.message?.contains("Not found") == true)
     }
 
     @Test
