@@ -52,15 +52,16 @@ class DefaultArticlesRepository @Inject constructor(
 
     @OptIn(ExperimentalPagingApi::class)
     override fun getArticlesPaged(searchQuery: String?): Flow<PagingData<Article>> {
-        val pagingSource = if (searchQuery.isNullOrBlank()) {
-            articleDao.pagingSource()
-        } else {
-            articleDao.searchPagingSource(searchQuery)
-        }
         return Pager(
             config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
-            remoteMediator = ArticleRemoteMediator(apiService, articleDao),
-            pagingSourceFactory = { pagingSource },
+            remoteMediator = ArticleRemoteMediator(apiService, articleDao, searchQuery),
+            pagingSourceFactory = {
+                if (searchQuery.isNullOrBlank()) {
+                    articleDao.pagingSource()
+                } else {
+                    articleDao.searchPagingSource(searchQuery)
+                }
+            },
         ).flow.map { pagingData -> pagingData.map { it.toArticle() } }
     }
 
