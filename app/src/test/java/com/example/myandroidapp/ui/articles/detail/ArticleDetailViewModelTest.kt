@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.analytics.AnalyticsHelper
 import com.example.myandroidapp.data.ArticlesRepository
+import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.test.MainDispatcherRule
 import com.example.myandroidapp.ui.UiState
 import io.mockk.coEvery
@@ -21,6 +22,7 @@ class ArticleDetailViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val analytics = mockk<AnalyticsHelper>(relaxed = true)
+    private val preferences = mockk<AppPreferences>(relaxed = true)
 
     @Test
     fun `loadArticle on success populates detail`() = runTest {
@@ -30,6 +32,7 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             repository = repository,
             analytics = analytics,
+            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -48,6 +51,7 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             repository = repository,
             analytics = analytics,
+            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -65,6 +69,7 @@ class ArticleDetailViewModelTest {
             ArticleDetailViewModel(
                 repository = repository,
                 analytics = analytics,
+                preferences = preferences,
                 savedStateHandle = SavedStateHandle(),
             )
         }

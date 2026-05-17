@@ -117,4 +117,7 @@ dependencies {
 
   // Lottie
   implementation(libs.lottie.compose)
+
+  // DataStore Preferences
+  implementation(libs.datastore.preferences)
 }

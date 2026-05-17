@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myandroidapp.data.Article
 import com.example.myandroidapp.data.ArticlesRepository
+import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.ui.UiState
 import com.example.myandroidapp.analytics.AnalyticsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +45,7 @@ data class ArticlesListActions(
 class ArticlesListViewModel @Inject constructor(
     private val repository: ArticlesRepository,
     private val analytics: AnalyticsHelper,
+    private val preferences: AppPreferences,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<ArticlesListState>>(UiState.Loading)
