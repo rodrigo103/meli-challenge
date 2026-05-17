@@ -23,6 +23,7 @@ coreSplashscreen = "1.2.0"
 leakcanary = "2.14"
 timber = "5.0.1"
 lottie = "6.6.2"
+turbine = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -61,6 +62,7 @@ leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.re
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

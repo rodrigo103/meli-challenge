@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myandroidapp.data.Article
 import com.example.myandroidapp.data.ArticlesRepository
+import com.example.myandroidapp.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,10 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class ArticleDetailUiState(
-    val article: Article? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null,
+data class ArticleDetailState(
+    val article: Article,
 )
 
 @HiltViewModel
@@ -27,8 +26,8 @@ class ArticleDetailViewModel @Inject constructor(
 
     private val articleId: Int = checkNotNull(savedStateHandle["articleId"]) { "articleId required" }
 
-    private val _uiState = MutableStateFlow(ArticleDetailUiState())
-    val uiState: StateFlow<ArticleDetailUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UiState<ArticleDetailState>>(UiState.Loading)
+    val uiState: StateFlow<UiState<ArticleDetailState>> = _uiState.asStateFlow()
 
     init {
         loadArticle()
@@ -36,18 +35,14 @@ class ArticleDetailViewModel @Inject constructor(
 
     fun loadArticle() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { UiState.Loading }
             repository.getArticle(articleId)
                 .onSuccess { article ->
-                    _uiState.update { it.copy(article = article, isLoading = false) }
+                    _uiState.value = UiState.Success(ArticleDetailState(article = article))
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                    _uiState.value = UiState.Error(e.message ?: "Unknown error")
                 }
         }
-    }
-
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 }

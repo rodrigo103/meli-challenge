@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,6 +52,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.myandroidapp.R
 import com.example.myandroidapp.data.Article
+import com.example.myandroidapp.ui.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,21 +65,11 @@ fun ArticlesListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    val shouldLoadMore by remember {
-        derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisibleItem >= state.articles.size - 3 && !state.isLoading && state.hasMore
-        }
-    }
-
-    LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) viewModel.loadArticles()
-    }
-
-    LaunchedEffect(state.error) {
-        state.error?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.clearError()
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ArticlesListEvent.Error -> snackbarHostState.showSnackbar(event.message)
+            }
         }
     }
 
@@ -90,30 +80,12 @@ fun ArticlesListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            SearchBar(
-                query = state.searchQuery,
-                onQueryChange = viewModel::onSearchQueryChanged,
-                onSearch = { viewModel.searchArticles(it) },
-                active = false,
-                onActiveChange = {},
-                placeholder = { Text("Search articles...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                trailingIcon = {
-                    if (state.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.clearSearch() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear")
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-            ) {}
-
-            if (state.isSearching || (state.isLoading && state.articles.isEmpty())) {
+        when (val current = state) {
+            is UiState.Loading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
                     contentAlignment = Alignment.Center,
                 ) {
                     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
@@ -123,33 +95,103 @@ fun ArticlesListScreen(
                         iterations = LottieConstants.IterateForever,
                     )
                 }
-            } else if (state.articles.isEmpty() && !state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
+            }
+
+            is UiState.Error -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = if (state.searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                        text = current.message,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.error,
                     )
-                }
-            } else {
-                LazyColumn(
-                    state = listState,
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.articles, key = { it.id }) { article ->
-                        ArticleCard(article = article, onClick = { onArticleClick(article.id) })
+                    Spacer(modifier = Modifier.height(16.dp))
+                    androidx.compose.material3.Button(onClick = { viewModel.retry() }) {
+                        Text("Retry")
                     }
-                    if (state.isLoading && state.articles.isNotEmpty()) {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                }
+            }
+
+            is UiState.Success -> {
+                val data = current.data
+                Column(modifier = Modifier.padding(padding)) {
+                    SearchBar(
+                        query = data.searchQuery,
+                        onQueryChange = viewModel::onSearchQueryChanged,
+                        onSearch = { viewModel.searchArticles(it) },
+                        active = false,
+                        onActiveChange = {},
+                        placeholder = { Text("Search articles...") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                        trailingIcon = {
+                            if (data.searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.clearSearch() }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Clear")
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    ) {}
+
+                    val shouldLoadMore by remember {
+                        derivedStateOf {
+                            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                            lastVisibleItem >= data.articles.size - 3 && !data.isLoadingMore && data.hasMore
+                        }
+                    }
+
+                    LaunchedEffect(shouldLoadMore) {
+                        if (shouldLoadMore) viewModel.loadArticles()
+                    }
+
+                    if (data.isSearching) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
+                            LottieAnimation(
+                                composition = composition,
+                                modifier = Modifier.size(160.dp),
+                                iterations = LottieConstants.IterateForever,
+                            )
+                        }
+                    } else if (data.articles.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = if (data.searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            state = listState,
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            items(data.articles, key = { it.id }) { article ->
+                                ArticleCard(article = article, onClick = { onArticleClick(article.id) })
+                            }
+                            if (data.isLoadingMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                    }
+                                }
                             }
                         }
                     }

@@ -4,12 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.data.ArticlesRepository
 import com.example.myandroidapp.test.MainDispatcherRule
+import com.example.myandroidapp.ui.UiState
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -31,8 +31,9 @@ class ArticleDetailViewModelTest {
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertEquals("Article Detail", state.article?.title)
+        assertTrue(state is UiState.Success)
+        val data = (state as UiState.Success).data
+        assertEquals("Article Detail", data.article.title)
     }
 
     @Test
@@ -47,31 +48,15 @@ class ArticleDetailViewModelTest {
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertNull(state.article)
-        assertEquals("Not found", state.error)
+        assertTrue(state is UiState.Error)
+        assertEquals("Not found", (state as UiState.Error).message)
     }
 
     @Test
-    fun `clearError clears error message`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.success(TestArticleData.articleDetail)
-
-        val viewModel = ArticleDetailViewModel(
-            repository = repository,
-            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
-        )
-        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-        viewModel.clearError()
-
-        assertNull(viewModel.uiState.value.error)
-    }
-
-    @Test
-    fun `throws when articleId missing from savedStateHandle`() = runTest {
+    fun `throws when articleId missing from savedStateHandle`() {
         val repository = mockk<ArticlesRepository>()
 
-        val exception = org.junit.Assert.assertThrows(IllegalStateException::class.java) {
+        val exception = assertThrows(IllegalStateException::class.java) {
             ArticleDetailViewModel(
                 repository = repository,
                 savedStateHandle = SavedStateHandle(),

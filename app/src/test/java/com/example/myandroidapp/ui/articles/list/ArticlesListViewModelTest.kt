@@ -1,14 +1,14 @@
 package com.example.myandroidapp.ui.articles.list
 
+import app.cash.turbine.test
 import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.data.ArticlesRepository
 import com.example.myandroidapp.test.MainDispatcherRule
+import com.example.myandroidapp.ui.UiState
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -29,9 +29,10 @@ class ArticlesListViewModelTest {
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertEquals(2, state.articles.size)
-        assertEquals("Article 1", state.articles[0].title)
+        assertTrue(state is UiState.Success)
+        val data = (state as UiState.Success).data
+        assertEquals(2, data.articles.size)
+        assertEquals("Article 1", data.articles[0].title)
     }
 
     @Test
@@ -45,9 +46,8 @@ class ArticlesListViewModelTest {
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertFalse(state.isLoading)
-        assertTrue(state.articles.isEmpty())
-        assertEquals("Network error", state.error)
+        assertTrue(state is UiState.Error)
+        assertEquals("Network error", (state as UiState.Error).message)
     }
 
     @Test
@@ -62,12 +62,14 @@ class ArticlesListViewModelTest {
 
         val viewModel = ArticlesListViewModel(repository)
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(1, viewModel.uiState.value.articles.size)
+        var data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(1, data.articles.size)
 
         viewModel.loadArticles()
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(2, viewModel.uiState.value.articles.size)
+        data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(2, data.articles.size)
     }
 
     @Test
@@ -82,16 +84,18 @@ class ArticlesListViewModelTest {
 
         val viewModel = ArticlesListViewModel(repository)
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(2, viewModel.uiState.value.articles.size)
+        var data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(2, data.articles.size)
 
         viewModel.searchArticles("nasa")
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(1, viewModel.uiState.value.articles.size)
+        data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(1, data.articles.size)
     }
 
     @Test
-    fun `searchArticles on failure sets error`() = runTest {
+    fun `searchArticles on failure emits error event`() = runTest {
         val repository = mockk<ArticlesRepository>()
         coEvery { repository.getArticles(offset = 0) } returns Result.success(emptyList())
         coEvery { repository.searchArticles("nasa") } returns Result.failure(
@@ -99,10 +103,15 @@ class ArticlesListViewModelTest {
         )
 
         val viewModel = ArticlesListViewModel(repository)
-        viewModel.searchArticles("nasa")
-        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.events.test {
+            viewModel.searchArticles("nasa")
+            mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals("Search failed", viewModel.uiState.value.error)
+            val event = awaitItem()
+            assertTrue(event is ArticlesListEvent.Error)
+            assertEquals("Search failed", (event as ArticlesListEvent.Error).message)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -111,8 +120,11 @@ class ArticlesListViewModelTest {
         coEvery { repository.getArticles(offset = 0) } returns Result.success(emptyList())
 
         val viewModel = ArticlesListViewModel(repository)
+        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
+
         viewModel.onSearchQueryChanged("nasa")
-        assertEquals("nasa", viewModel.uiState.value.searchQuery)
+        val data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals("nasa", data.searchQuery)
     }
 
     @Test
@@ -121,31 +133,20 @@ class ArticlesListViewModelTest {
         coEvery { repository.getArticles(offset = 0) } returns Result.success(
             listOf(TestArticleData.article1)
         )
+        coEvery { repository.getArticles(offset = 0) } returns Result.success(
+            listOf(TestArticleData.article1)
+        )
 
         val viewModel = ArticlesListViewModel(repository)
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(1, viewModel.uiState.value.articles.size)
+        var data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals(1, data.articles.size)
 
         viewModel.onSearchQueryChanged("nasa")
         viewModel.clearSearch()
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals("", viewModel.uiState.value.searchQuery)
-    }
-
-    @Test
-    fun `clearError clears error message`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticles(offset = 0) } returns Result.success(emptyList())
-        coEvery { repository.searchArticles(any()) } returns Result.failure(
-            Exception("Not found")
-        )
-
-        val viewModel = ArticlesListViewModel(repository)
-        viewModel.searchArticles("fail")
-        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.clearError()
-        assertNull(viewModel.uiState.value.error)
+        data = (viewModel.uiState.value as UiState.Success).data
+        assertEquals("", data.searchQuery)
     }
 }

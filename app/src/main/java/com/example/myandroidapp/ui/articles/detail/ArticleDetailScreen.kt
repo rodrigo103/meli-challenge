@@ -4,13 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -41,6 +40,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.myandroidapp.R
 import com.example.myandroidapp.data.Article
+import com.example.myandroidapp.ui.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,8 +64,8 @@ fun ArticleDetailScreen(
             )
         },
     ) { padding ->
-        when {
-            state.isLoading -> {
+        when (val current = state) {
+            is UiState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -80,7 +80,8 @@ fun ArticleDetailScreen(
                     )
                 }
             }
-            state.error != null -> {
+
+            is UiState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -88,15 +89,16 @@ fun ArticleDetailScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = state.error!!,
+                        text = current.message,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
             }
-            state.article != null -> {
+
+            is UiState.Success -> {
                 ArticleDetailContent(
-                    article = state.article!!,
+                    article = current.data.article,
                     modifier = Modifier.padding(padding),
                 )
             }
@@ -150,7 +152,6 @@ private fun ArticleDetailContent(article: Article, modifier: Modifier = Modifier
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
             }
         }
 
@@ -177,8 +178,6 @@ private fun ArticleDetailContent(article: Article, modifier: Modifier = Modifier
                 context.startActivity(intent)
             }) {
                 Icon(Icons.Default.OpenInBrowser, contentDescription = "Open in browser")
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Read full article")
             }
         }
     }
