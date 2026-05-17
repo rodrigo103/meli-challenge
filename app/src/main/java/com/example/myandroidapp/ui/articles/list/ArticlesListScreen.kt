@@ -181,7 +181,7 @@ fun ArticlesListScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(data.articles, key = { it.id }) { article ->
-                                ArticleCard(article = article, onClick = { onArticleClick(article.id) })
+                                articleCardSettings(article = article, onClick = { onArticleClick(article.id) })()
                             }
                             if (data.isLoadingMore) {
                                 item {
@@ -202,7 +202,7 @@ fun ArticlesListScreen(
 }
 
 @Composable
-fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ArticleCard(article: Article, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth()

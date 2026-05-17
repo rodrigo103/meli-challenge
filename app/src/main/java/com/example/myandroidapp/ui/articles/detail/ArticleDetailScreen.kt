@@ -97,17 +97,17 @@ fun ArticleDetailScreen(
             }
 
             is UiState.Success -> {
-                ArticleDetailContent(
+                articleDetailContentSettings(
                     article = current.data.article,
                     modifier = Modifier.padding(padding),
-                )
+                )()
             }
         }
     }
 }
 
 @Composable
-private fun ArticleDetailContent(article: Article, modifier: Modifier = Modifier) {
+internal fun ArticleDetailContent(article: Article, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
