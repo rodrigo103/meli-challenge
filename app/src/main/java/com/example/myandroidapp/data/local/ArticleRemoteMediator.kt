@@ -12,7 +12,6 @@ import kotlinx.coroutines.CancellationException
 class ArticleRemoteMediator(
     private val apiService: ApiService,
     private val articleDao: ArticleDao,
-    private val searchQuery: String? = null,
 ) : RemoteMediator<Int, ArticleEntity>() {
 
     override suspend fun load(
@@ -30,11 +29,7 @@ class ArticleRemoteMediator(
         }
 
         return try {
-            val response = apiService.getArticles(
-                limit = PAGE_SIZE,
-                offset = offset,
-                search = searchQuery,
-            )
+            val response = apiService.getArticles(limit = PAGE_SIZE, offset = offset)
             val body = response.extractBody()
             val articles = body.results
             articleDao.insertAll(articles.map { it.toEntity() })

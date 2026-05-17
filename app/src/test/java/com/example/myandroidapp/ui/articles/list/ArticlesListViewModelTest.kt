@@ -22,28 +22,28 @@ class ArticlesListViewModelTest {
     private val preferences = mockk<AppPreferences>(relaxed = true)
 
     @Test
-    fun `onSearchQueryChanged updates display query`() = runTest {
+    fun `onSearchTextChange updates search query`() = runTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
         val viewModel = ArticlesListViewModel(repository, analytics, preferences)
 
-        viewModel.onSearchQueryChanged("nasa")
+        viewModel.onSearchTextChange("nasa")
 
-        assertEquals("nasa", viewModel.searchDisplayQuery.value)
+        assertEquals("nasa", viewModel.searchQuery.value)
     }
 
     @Test
-    fun `clearSearch resets display query`() = runTest {
+    fun `clearSearch resets search query`() = runTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
         val viewModel = ArticlesListViewModel(repository, analytics, preferences)
 
-        viewModel.search("nasa")
+        viewModel.onSearchTextChange("nasa")
         viewModel.clearSearch()
 
-        assertEquals("", viewModel.searchDisplayQuery.value)
+        assertEquals("", viewModel.searchQuery.value)
     }
 
     @Test
