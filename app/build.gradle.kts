@@ -120,4 +120,15 @@ dependencies {
 
   // DataStore Preferences
   implementation(libs.datastore.preferences)
+
+  // Room
+  implementation(libs.room.runtime)
+  implementation(libs.room.ktx)
+  implementation(libs.room.paging)
+  ksp(libs.room.compiler)
+
+  // Paging 3
+  implementation(libs.paging.runtime)
+  implementation(libs.paging.compose)
+  implementation(libs.paging.common)
 }

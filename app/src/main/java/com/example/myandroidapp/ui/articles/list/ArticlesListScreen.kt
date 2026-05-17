@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -34,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,6 +43,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -52,7 +55,6 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.myandroidapp.R
 import com.example.myandroidapp.data.Article
-import com.example.myandroidapp.ui.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,15 +63,18 @@ fun ArticlesListScreen(
     modifier: Modifier = Modifier,
 ) {
     val viewModel: ArticlesListViewModel = hiltViewModel()
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val articles = viewModel.articles.collectAsLazyPagingItems()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val listState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is ArticlesListEvent.Error -> snackbarHostState.showSnackbar(event.message)
-            }
+    LaunchedEffect(articles.loadState) {
+        val error = when {
+            articles.loadState.refresh is LoadState.Error -> articles.loadState.refresh as LoadState.Error
+            articles.loadState.append is LoadState.Error -> articles.loadState.append as LoadState.Error
+            else -> null
+        }
+        error?.let {
+            snackbarHostState.showSnackbar(it.error.message ?: "Unknown error")
         }
     }
 
@@ -80,8 +85,9 @@ fun ArticlesListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
-        when (val current = state) {
-            is UiState.Loading -> {
+        val refreshState = articles.loadState.refresh
+        when {
+            refreshState is LoadState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -97,7 +103,7 @@ fun ArticlesListScreen(
                 }
             }
 
-            is UiState.Error -> {
+            refreshState is LoadState.Error -> {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -106,30 +112,31 @@ fun ArticlesListScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = current.message,
+                        text = refreshState.error.message ?: "Unknown error",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.error,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    androidx.compose.material3.Button(onClick = { viewModel.retry() }) {
+                    androidx.compose.material3.Button(
+                        onClick = { articles.retry() }
+                    ) {
                         Text("Retry")
                     }
                 }
             }
 
-            is UiState.Success -> {
-                val data = current.data
+            else -> {
                 Column(modifier = Modifier.padding(padding)) {
                     SearchBar(
-                        query = data.searchQuery,
+                        query = searchQuery,
                         onQueryChange = viewModel::onSearchQueryChanged,
-                        onSearch = { viewModel.searchArticles(it) },
+                        onSearch = {},
                         active = false,
                         onActiveChange = {},
                         placeholder = { Text("Search articles...") },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                         trailingIcon = {
-                            if (data.searchQuery.isNotEmpty()) {
+                            if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { viewModel.clearSearch() }) {
                                     Icon(Icons.Default.Close, contentDescription = "Clear")
                                 }
@@ -140,50 +147,36 @@ fun ArticlesListScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {}
 
-                    val shouldLoadMore by remember {
-                        derivedStateOf {
-                            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                            lastVisibleItem >= data.articles.size - 3 && !data.isLoadingMore && data.hasMore
-                        }
-                    }
-
-                    LaunchedEffect(shouldLoadMore) {
-                        if (shouldLoadMore) viewModel.loadArticles()
-                    }
-
-                    if (data.isSearching) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
-                            LottieAnimation(
-                                composition = composition,
-                                modifier = Modifier.size(160.dp),
-                                iterations = LottieConstants.IterateForever,
-                            )
-                        }
-                    } else if (data.articles.isEmpty()) {
+                    if (articles.itemCount == 0 && articles.loadState.refresh is LoadState.NotLoading) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = if (data.searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                                text = if (searchQuery.isNotEmpty()) "No results found" else "No articles available",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     } else {
                         LazyColumn(
-                            state = listState,
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(data.articles, key = { it.id }) { article ->
-                                articleCardSettings(article = article, onClick = { onArticleClick(article.id) })()
+                            items(
+                                count = articles.itemCount,
+                                key = articles.itemKey { it.id },
+                                contentType = articles.itemContentType { "article" },
+                            ) { index ->
+                                val article = articles[index]
+                                if (article != null) {
+                                    articleCardSettings(
+                                        article = article,
+                                        onClick = { onArticleClick(article.id) },
+                                    )()
+                                }
                             }
-                            if (data.isLoadingMore) {
+                            if (articles.loadState.append is LoadState.Loading) {
                                 item {
                                     Box(
                                         modifier = Modifier.fillMaxWidth(),

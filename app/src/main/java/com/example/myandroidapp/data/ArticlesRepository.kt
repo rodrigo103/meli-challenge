@@ -1,9 +1,18 @@
 package com.example.myandroidapp.data
 
-import java.io.IOException
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.example.myandroidapp.data.local.ArticleDao
+import com.example.myandroidapp.data.local.ArticleRemoteMediator
+import com.example.myandroidapp.data.local.toArticle
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 
 interface ArticlesRepository {
     suspend fun getArticles(limit: Int = 20, offset: Int = 0): Result<List<Article>>
@@ -11,11 +20,14 @@ interface ArticlesRepository {
     suspend fun searchArticles(query: String, limit: Int = 20): Result<List<Article>>
 
     suspend fun getArticle(id: Int): Result<Article>
+
+    fun getArticlesPaged(searchQuery: String? = null): Flow<PagingData<Article>>
 }
 
 @Singleton
 class DefaultArticlesRepository @Inject constructor(
     private val apiService: ApiService,
+    private val articleDao: ArticleDao,
 ) : ArticlesRepository {
     override suspend fun getArticles(limit: Int, offset: Int): Result<List<Article>> =
         runCatching {
@@ -37,4 +49,22 @@ class DefaultArticlesRepository @Inject constructor(
         }.onFailure {
             Timber.e(it, "Error fetching article with id: %d", id)
         }
+
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getArticlesPaged(searchQuery: String?): Flow<PagingData<Article>> {
+        val pagingSource = if (searchQuery.isNullOrBlank()) {
+            articleDao.pagingSource()
+        } else {
+            articleDao.searchPagingSource(searchQuery)
+        }
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
+            remoteMediator = ArticleRemoteMediator(apiService, articleDao),
+            pagingSourceFactory = { pagingSource },
+        ).flow.map { pagingData -> pagingData.map { it.toArticle() } }
+    }
+
+    private companion object {
+        const val PAGE_SIZE = 20
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.myandroidapp.data
 
 import com.example.myandroidapp.TestJson
+import com.example.myandroidapp.data.local.ArticleDao
 import com.example.myandroidapp.rules.MockWebServerRule
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -29,7 +31,8 @@ class ArticlesRepositoryTest {
             )
             .build()
             .create(ApiService::class.java)
-        return DefaultArticlesRepository(api)
+        val dao = mockk<ArticleDao>(relaxed = true)
+        return DefaultArticlesRepository(api, dao)
     }
 
     @Test
