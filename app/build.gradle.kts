@@ -62,11 +62,13 @@ sonarqube {
     property("sonar.organization", "rodrigo103")
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.sources", "src/main/java")
-    property("sonar.tests", "src/test/java")
+    property("sonar.tests", "src/test/java, src/androidTest/java")
+    property("sonar.java.coveragePlugin", "jacoco")
     property("sonar.java.binaries", "")
     property("sonar.java.test.binaries", "")
     property("sonar.android.lint.report", "build/reports/lint-results-debug.xml")
   }
+}
 }
 
 dependencies {
