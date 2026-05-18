@@ -1,3 +1,13 @@
+---
+tags:
+  - wiki/tool
+---
+
+---
+tags:
+  - wiki/tool
+---
+
 # Detekt Setup
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]

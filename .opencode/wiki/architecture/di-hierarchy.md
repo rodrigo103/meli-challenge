@@ -3,11 +3,6 @@ tags:
   - wiki/architecture
 ---
 
----
-tags:
-  - wiki/architecture
----
-
 # DI Hierarchy
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]
@@ -39,6 +34,14 @@ AppModule (Context, DataStore)
     ├── DatabaseModule
     └── DispatcherModule
 ```
+
+## Ver también
+
+- [[tools/hilt-setup]] — Detalles de los módulos Hilt
+
+## Ver también
+
+- [[tools/hilt-setup]] — Detalles de los módulos Hilt
 
 ## Entry points
 

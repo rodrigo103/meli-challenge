@@ -17,6 +17,8 @@ Base de conocimiento persistente del proyecto, mantenida por opencode.
 
 ## Patterns
 
+- [[patterns/attributes-actions]] — Attributes/Actions pattern (Ualá style)
+- [[patterns/attributes-actions]] — Attributes/Actions pattern (Ualá style)
 - [[patterns/mvvm-repository]] — MVVM + Repository pattern
 - [[patterns/error-handling]] — Manejo de errores con Result + UiState
 - [[patterns/room-paging]] — Room + Paging 3 + RemoteMediator
@@ -25,6 +27,8 @@ Base de conocimiento persistente del proyecto, mantenida por opencode.
 ## Tools
 
 - [[tools/retrofit-setup]] — Retrofit + OkHttp + kotlinx.serialization
+- [[tools/detekt-setup]] — Detekt lint + Compose rules
+- [[tools/detekt-setup]] — Detekt lint + Compose rules
 - [[tools/hilt-setup]] — Hilt DI + módulos
 - [[tools/detekt-setup]] — Detekt: static analysis, Compose rules, baseline, CI
 - [[tools/key-dependencies]] — Resumen de dependencias clave

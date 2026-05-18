@@ -7,4 +7,5 @@
 .externalNativeBuild
 /.idea/
 .kotlin
-.obsidian/
+.opencode/wiki/.obsidian/*
+!.opencode/wiki/.obsidian/graph.json

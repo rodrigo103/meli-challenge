@@ -3,11 +3,6 @@ tags:
   - wiki/architecture
 ---
 
----
-tags:
-  - wiki/architecture
----
-
 # App Structure
 
 > **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `HttpErrorCallAdapter.kt` activado

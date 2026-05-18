@@ -3,11 +3,6 @@ tags:
   - wiki/pattern
 ---
 
----
-tags:
-  - wiki/pattern
----
-
 # Error Handling
 
 > **Last verified:** 2026-05-18 | **Verified by:** [source] — migrado de `extractBody()` a `CallAdapter.Factory`

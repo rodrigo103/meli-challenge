@@ -3,11 +3,6 @@ tags:
   - wiki/architecture
 ---
 
----
-tags:
-  - wiki/architecture
----
-
 # Data Layer
 
 > **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `extractBody()` reemplazado por `CallAdapter.Factory`

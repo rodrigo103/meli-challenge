@@ -2,16 +2,6 @@
 tags:
   - wiki/tool
 ---
-
----
-tags:
-  - wiki/tool
----
-
-# Retrofit Setup
-
-> **Last verified:** 2026-05-18 | **Verified by:** [source] — migrado de `Response<T>` + `extractBody()` a `CallAdapter.Factory`
-
 ## Config
 
 - Base URL: `https://api.spaceflightnewsapi.net/v4`

@@ -1,3 +1,13 @@
+---
+tags:
+  - wiki/pattern
+---
+
+---
+tags:
+  - wiki/pattern
+---
+
 # Attributes / Actions Pattern
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]
