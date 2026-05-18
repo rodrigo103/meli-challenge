@@ -3,7 +3,6 @@ package com.example.myandroidapp.ui.articles.list
 import androidx.paging.PagingData
 import com.example.myandroidapp.analytics.AnalyticsHelper
 import com.example.myandroidapp.data.ArticlesRepository
-import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.test.MainDispatcherRule
 import io.mockk.every
 import io.mockk.mockk
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,18 +19,15 @@ class ArticlesListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val analytics = mockk<AnalyticsHelper>(relaxed = true)
-    private val preferences = mockk<AppPreferences>(relaxed = true)
-
     @Test
     fun `initial states are correct`() = runTest {
         val repository = mockk<ArticlesRepository>()
+        val analytics = mockk<AnalyticsHelper>(relaxed = true)
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
+        val viewModel = ArticlesListViewModel(repository, analytics)
 
         assertEquals("", viewModel.searchQuery.value)
-        assertNull(viewModel.selectedArticleId.value)
     }
 
     @Test
@@ -41,7 +36,7 @@ class ArticlesListViewModelTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        ArticlesListViewModel(repository, analytics, preferences)
+        ArticlesListViewModel(repository, analytics)
 
         verify { analytics.logScreenView("ArticlesList") }
     }
@@ -49,9 +44,10 @@ class ArticlesListViewModelTest {
     @Test
     fun `articles flow is lazy paging flow`() {
         val repository = mockk<ArticlesRepository>()
+        val analytics = mockk<AnalyticsHelper>(relaxed = true)
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
+        val viewModel = ArticlesListViewModel(repository, analytics)
 
         assertNotNull(viewModel.articles)
     }
@@ -62,7 +58,7 @@ class ArticlesListViewModelTest {
         val repository = mockk<ArticlesRepository>()
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
+        val viewModel = ArticlesListViewModel(repository, analytics)
 
         viewModel.sendAnalytics("test_event", mapOf("key" to "value"))
 
@@ -72,9 +68,10 @@ class ArticlesListViewModelTest {
     @Test
     fun `onSearchTextChange updates search query`() = runTest {
         val repository = mockk<ArticlesRepository>()
+        val analytics = mockk<AnalyticsHelper>(relaxed = true)
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
+        val viewModel = ArticlesListViewModel(repository, analytics)
 
         viewModel.onSearchTextChange("nasa")
 
@@ -84,25 +81,14 @@ class ArticlesListViewModelTest {
     @Test
     fun `clearSearch resets search query`() = runTest {
         val repository = mockk<ArticlesRepository>()
+        val analytics = mockk<AnalyticsHelper>(relaxed = true)
         every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
 
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
+        val viewModel = ArticlesListViewModel(repository, analytics)
 
         viewModel.onSearchTextChange("nasa")
         viewModel.clearSearch()
 
         assertEquals("", viewModel.searchQuery.value)
-    }
-
-    @Test
-    fun `onArticleSelected updates selectedArticleId`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        every { repository.getArticlesPaged(any()) } returns flowOf(PagingData.empty())
-
-        val viewModel = ArticlesListViewModel(repository, analytics, preferences)
-
-        viewModel.onArticleSelected(42)
-
-        assertEquals(42, viewModel.selectedArticleId.value)
     }
 }

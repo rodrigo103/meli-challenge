@@ -27,9 +27,6 @@ class ArticlesListViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _selectedArticleId = MutableStateFlow<Int?>(null)
-    val selectedArticleId: StateFlow<Int?> = _selectedArticleId.asStateFlow()
-
     init {
         analytics.logScreenView("ArticlesList")
     }
@@ -48,10 +45,6 @@ class ArticlesListViewModel @Inject constructor(
 
     fun clearSearch() {
         _searchQuery.value = ""
-    }
-
-    fun onArticleSelected(id: Int) {
-        _selectedArticleId.value = id
     }
 
     fun sendAnalytics(event: String, properties: Map<String, String>) {

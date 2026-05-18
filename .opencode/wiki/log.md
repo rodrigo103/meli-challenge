@@ -1,6 +1,32 @@
 # Changelog del Wiki
 
-## 2026-05-18
+## 2026-05-18 (2)
+
+- Refactor DualPaneScreen + introducción de `GetArticleUseCase`
+  - Created `data/usecase/GetArticleUseCase` — pure domain use case: timeout + fetch article by ID
+  - Created `ui/articles/detail/ArticleDetailPaneViewModel` — ViewModel para tablet detail pane (dynamic articleId)
+  - Updated `DualPaneScreen` — eliminado `repository` param, usa `ArticlesListViewModel` + `ArticleDetailPaneViewModel` como default params, estado de selección local
+  - Updated `ArticleDetailViewModel` — ahora usa `GetArticleUseCase` en vez de `repository.getArticle` directo
+  - Updated `ArticlesListViewModel` — eliminado `selectedArticleId` / `onArticleSelected` (solo se usaba en tablet)
+  - Deleted `ui/RepositoryEntryPoint` — ya no necesario
+  - Updated `ui/ResponsiveApp` — eliminado `EntryPointAccessors`
+  - Updated [[architecture/app-structure]] — removed `RepositoryEntryPoint`, added `usecase/` and `ArticleDetailPaneViewModel`
+  - Updated [[architecture/di-hierarchy]] — removed `RepositoryEntryPoint`
+  - Updated [[tools/hilt-setup]] — removed EntryPoint section
+  - Eliminados todos los `@Suppress("ViewModelInjection")` del proyecto (2)
+
+- Refactor DualPaneScreen + introducción de `GetArticleUseCase`
+  - Created `data/usecase/GetArticleUseCase` — pure domain use case: timeout + fetch article by ID
+  - Created `ui/articles/detail/ArticleDetailPaneViewModel` — ViewModel para tablet detail pane (dynamic articleId)
+  - Updated `DualPaneScreen` — eliminado `repository` param, usa `ArticlesListViewModel` + `ArticleDetailPaneViewModel` como default params, estado de selección local
+  - Updated `ArticleDetailViewModel` — ahora usa `GetArticleUseCase` en vez de `repository.getArticle` directo
+  - Updated `ArticlesListViewModel` — eliminado `selectedArticleId` / `onArticleSelected` (solo se usaba en tablet)
+  - Deleted `ui/RepositoryEntryPoint` — ya no necesario
+  - Updated `ui/ResponsiveApp` — eliminado `EntryPointAccessors`
+  - Updated [[architecture/app-structure]] — removed `RepositoryEntryPoint`, added `usecase/` and `ArticleDetailPaneViewModel`
+  - Updated [[architecture/di-hierarchy]] — removed `RepositoryEntryPoint`
+  - Updated [[tools/hilt-setup]] — removed EntryPoint section
+  - Eliminados todos los `@Suppress("ViewModelInjection")` del proyecto
 
 - Migración de `Response<T>` + `extractBody()` a `CallAdapter.Factory` automático
   - Updated [[tools/retrofit-setup]] — Apis devuelven dominio directo, `HttpErrorCallAdapterFactory` activado

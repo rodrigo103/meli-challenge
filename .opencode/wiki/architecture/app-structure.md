@@ -27,21 +27,22 @@ com.example.myandroidapp/
 │   └── AnalyticsModule.kt        # AnalyticsHelper binding
 ├── data/
 │   ├── Article.kt                # Domain model + API response
-│   ├── ApiService.kt             # Retrofit interface (domain types, no Response<T>)
+│   ├── ApiService.kt             # Retrofit interface
 │   ├── ApiException.kt           # HTTP error sealed exception hierarchy
-│   ├── HttpErrorCallAdapter.kt   # CallAdapter.Factory — intercepta non-2xx → ApiException
+│   ├── HttpErrorCallAdapter.kt   # CallAdapter.Factory
 │   ├── ArticlesRepository.kt     # Repository (API + Room)
+│   ├── usecase/
+│   │   └── GetArticleUseCase.kt  # Timeout + fetch article by ID
 │   ├── local/
-│   │   ├── AppDatabase.kt        # Room database definition
-│   │   ├── ArticleEntity.kt      # Room entity
-│   │   ├── ArticleDao.kt         # Room DAO with Paging
-│   │   └── ArticleRemoteMediator.kt  # Paging RemoteMediator for API + Room sync
+│   │   ├── AppDatabase.kt
+│   │   ├── ArticleEntity.kt
+│   │   ├── ArticleDao.kt
+│   │   └── ArticleRemoteMediator.kt
 │   └── preferences/
-│       └── AppPreferences.kt     # DataStore preferences wrapper
+│       └── AppPreferences.kt
 ├── ui/
-│   ├── DualPaneScreen.kt         # Adaptive layout (list + detail)
-│   ├── ResponsiveApp.kt          # Window size-based routing
-│   ├── RepositoryEntryPoint.kt   # Hilt entry point for Repository
+│   ├── DualPaneScreen.kt         # Adaptive layout (list + detail, tablet)
+│   ├── ResponsiveApp.kt          # Window size-based routing (phone vs tablet)
 │   ├── articles/
 │   │   ├── list/
 │   │   │   ├── ArticlesListScreen.kt
@@ -52,11 +53,12 @@ com.example.myandroidapp/
 │   │       ├── ArticleDetailScreen.kt
 │   │       ├── ArticleDetailScreenRoute.kt
 │   │       ├── ArticleDetailScreenState.kt
-│   │       └── ArticleDetailViewModel.kt
-│   └── preview/                  # Compose previews
+│   │       ├── ArticleDetailViewModel.kt        # Phone detail (SavedStateHandle)
+│   │       └── ArticleDetailPaneViewModel.kt  # Tablet detail (dynamic articleId)
+│   └── preview/
 ├── analytics/
-│   ├── AnalyticsHelper.kt        # Analytics interface
-│   └── TimberAnalyticsHelper.kt  # Timber implementation
+│   ├── AnalyticsHelper.kt
+│   └── TimberAnalyticsHelper.kt
 └── theme/
     ├── Color.kt
     ├── Theme.kt

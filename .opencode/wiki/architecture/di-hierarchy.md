@@ -5,9 +5,11 @@ tags:
 
 # DI Hierarchy
 
-> **Last verified:** 2026-05-17 | **Verified by:** [source]
+> **Last verified:** 2026-05-18 | **Verified by:** [source]
 
 Jerarquía de módulos de Hilt DI. Todos los módulos están en `com.example.myandroidapp.di`.
+
+RepositoryEntryPoint eliminado — ya no se pasa repository a composables.
 
 ## Módulos
 
@@ -35,16 +37,11 @@ AppModule (Context, DataStore)
     └── DispatcherModule
 ```
 
-## Ver también
-
-- [[tools/hilt-setup]] — Detalles de los módulos Hilt
-
-## Ver también
-
-- [[tools/hilt-setup]] — Detalles de los módulos Hilt
-
 ## Entry points
 
-- `RepositoryEntryPoint` in `ui/` package — `@HiltEntryPoint` para acceder a `ArticlesRepository` desde `ArticleDetailScreen` [source]
 - `MainActivity` — `@AndroidEntryPoint`
 - `MyApplication` — `@HiltAndroidApp`
+
+## Ver también
+
+- [[tools/hilt-setup]] — Detalles de los módulos Hilt

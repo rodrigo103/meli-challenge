@@ -19,21 +19,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.myandroidapp.data.Article
-import com.example.myandroidapp.data.ArticlesRepository
+import com.example.myandroidapp.ui.articles.detail.ArticleDetailPaneViewModel
 import com.example.myandroidapp.ui.articles.detail.articleDetailContentSettings
 import com.example.myandroidapp.ui.articles.list.ArticlesListActions
 import com.example.myandroidapp.ui.articles.list.ArticlesListAttributes
 import com.example.myandroidapp.ui.articles.list.ArticlesListScreen
 import com.example.myandroidapp.ui.articles.list.ArticlesListViewModel
 
-@Suppress("ViewModelInjection")
 @Composable
 fun DualPaneScreen(
-    repository: ArticlesRepository,
     modifier: Modifier = Modifier,
+    listViewModel: ArticlesListViewModel = hiltViewModel(),
+    detailViewModel: ArticleDetailPaneViewModel = hiltViewModel(),
 ) {
-    val listViewModel: ArticlesListViewModel = hiltViewModel()
+    var selectedArticleId by remember { mutableStateOf<Int?>(null) }
     val searchQuery by listViewModel.searchQuery.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -47,7 +46,7 @@ fun DualPaneScreen(
                     actions = ArticlesListActions(
                         onSearchTextChange = listViewModel::onSearchTextChange,
                         onClearSearch = listViewModel::clearSearch,
-                        onArticleClick = { listViewModel.onArticleSelected(it) },
+                        onArticleClick = { selectedArticleId = it },
                         sendAnalytics = listViewModel::sendAnalytics,
                     ),
                     modifier = Modifier.fillMaxSize(),
@@ -55,23 +54,19 @@ fun DualPaneScreen(
             }
             VerticalDivider(modifier = Modifier.fillMaxHeight())
             Box(modifier = Modifier.weight(DETAIL_WEIGHT).fillMaxSize()) {
-                val selectedArticleId by listViewModel.selectedArticleId.collectAsStateWithLifecycle()
                 DetailPane(
                     articleId = selectedArticleId,
-                    repository = repository,
+                    viewModel = detailViewModel,
                 )
             }
         }
     }
 }
 
-private const val LIST_WEIGHT = 0.4f
-private const val DETAIL_WEIGHT = 0.6f
-
 @Composable
 private fun DetailPane(
     articleId: Int?,
-    repository: ArticlesRepository,
+    viewModel: ArticleDetailPaneViewModel,
 ) {
     if (articleId == null) {
         Box(
@@ -85,16 +80,11 @@ private fun DetailPane(
             )
         }
     } else {
-        var detailState by remember(articleId) { mutableStateOf<UiState<Article>>(UiState.Loading) }
-
         LaunchedEffect(articleId) {
-            detailState = UiState.Loading
-            repository.getArticle(articleId)
-                .onSuccess { article -> detailState = UiState.Success(article) }
-                .onFailure { e -> detailState = UiState.Error(e.message ?: "Unknown error") }
+            viewModel.loadArticle(articleId)
         }
-
-        when (val state = detailState) {
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        when (val s = state) {
             is UiState.Loading -> Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
@@ -107,14 +97,16 @@ private fun DetailPane(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = state.message,
+                    text = s.message,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
 
             is UiState.Success -> articleDetailContentSettings(
-                article = state.data,
-            )()
+                article = s.data.article)()
         }
     }
 }
+
+private const val LIST_WEIGHT = 0.4f
+private const val DETAIL_WEIGHT = 0.6f

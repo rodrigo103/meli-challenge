@@ -5,7 +5,7 @@ tags:
 
 # Hilt Setup
 
-> **Last verified:** 2026-05-17 | **Verified by:** [source]
+> **Last verified:** 2026-05-18 | **Verified by:** [source]
 
 ## Entries
 
@@ -38,7 +38,3 @@ implementation(libs.hilt.android)
 ksp(libs.hilt.compiler)
 implementation(libs.hilt.navigation.compose)
 ```
-
-## Entry Point para acceso sin ViewModel
-
-`RepositoryEntryPoint` en `ui/` package es un `@HiltEntryPoint` que permite acceder a `ArticlesRepository` desde contexts donde no hay inyección automática (ej: `ArticleDetailScreen` usa `hiltViewModel` en el Route, pero hay un entry point como fallback).

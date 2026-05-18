@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.myandroidapp.MainNavigation
-import dagger.hilt.android.EntryPointAccessors
 
 @Composable
 fun ResponsiveApp(modifier: Modifier = Modifier) {
@@ -15,15 +13,7 @@ fun ResponsiveApp(modifier: Modifier = Modifier) {
         if (maxWidth < 840.dp) {
             MainNavigation()
         } else {
-            val context = LocalContext.current
-            val repository = EntryPointAccessors.fromApplication(
-                context.applicationContext,
-                RepositoryEntryPoint::class.java,
-            ).repository
-            DualPaneScreen(
-                repository = repository,
-                modifier = Modifier.fillMaxSize(),
-            )
+            DualPaneScreen(modifier = Modifier.fillMaxSize())
         }
     }
 }

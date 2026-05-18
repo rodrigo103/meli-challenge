@@ -3,7 +3,7 @@ package com.example.myandroidapp.ui.articles.detail
 import androidx.lifecycle.SavedStateHandle
 import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.analytics.AnalyticsHelper
-import com.example.myandroidapp.data.ArticlesRepository
+import com.example.myandroidapp.data.usecase.GetArticleUseCase
 import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.test.MainDispatcherRule
 import com.example.myandroidapp.ui.UiState
@@ -28,10 +28,10 @@ class ArticleDetailViewModelTest {
 
     @Test
     fun `initial state is Loading`() {
-        val repository = mockk<ArticlesRepository>()
+        val getArticle = mockk<GetArticleUseCase>()
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -42,11 +42,11 @@ class ArticleDetailViewModelTest {
 
     @Test
     fun `null error message falls back to Unknown error`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.failure(Exception())
+        val getArticle = mockk<GetArticleUseCase>()
+        coEvery { getArticle(1) } returns Result.failure(Exception())
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -61,11 +61,11 @@ class ArticleDetailViewModelTest {
     @Test
     fun `logs event on success`() = runTest {
         val analytics = mockk<AnalyticsHelper>(relaxed = true)
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.success(TestArticleData.articleDetail)
+        val getArticle = mockk<GetArticleUseCase>()
+        coEvery { getArticle(1) } returns Result.success(TestArticleData.articleDetail)
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -78,11 +78,11 @@ class ArticleDetailViewModelTest {
     @Test
     fun `persists last opened article id on success`() = runTest {
         val preferences = mockk<AppPreferences>(relaxed = true)
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.success(TestArticleData.articleDetail)
+        val getArticle = mockk<GetArticleUseCase>()
+        coEvery { getArticle(1) } returns Result.success(TestArticleData.articleDetail)
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -93,12 +93,12 @@ class ArticleDetailViewModelTest {
     }
 
     @Test
-    fun `loadArticle on success populates detail`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.success(TestArticleData.articleDetail)
+    fun `loadArticle on success populates detail on success`() = runTest {
+        val getArticle = mockk<GetArticleUseCase>()
+        coEvery { getArticle(1) } returns Result.success(TestArticleData.articleDetail)
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -113,11 +113,11 @@ class ArticleDetailViewModelTest {
 
     @Test
     fun `loadArticle on failure sets error`() = runTest {
-        val repository = mockk<ArticlesRepository>()
-        coEvery { repository.getArticle(1) } returns Result.failure(Exception("Not found"))
+        val getArticle = mockk<GetArticleUseCase>()
+        coEvery { getArticle(1) } returns Result.failure(Exception("Not found"))
 
         val viewModel = ArticleDetailViewModel(
-            repository = repository,
+            getArticle = getArticle,
             analytics = analytics,
             preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
@@ -131,11 +131,11 @@ class ArticleDetailViewModelTest {
 
     @Test
     fun `throws when articleId missing from savedStateHandle`() {
-        val repository = mockk<ArticlesRepository>()
+        val getArticle = mockk<GetArticleUseCase>()
 
         val exception = assertThrows(IllegalStateException::class.java) {
             ArticleDetailViewModel(
-                repository = repository,
+                getArticle = getArticle,
                 analytics = analytics,
                 preferences = preferences,
                 savedStateHandle = SavedStateHandle(),
