@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.detekt)
   alias(libs.plugins.sonarcloud)
+  alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -69,7 +70,8 @@ sonarqube {
 }
 
 dependencies {
-  val composeBom = platform(libs.androidx.compose.bom)
+  implementation(libs.firebase.analytics)
+    val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
 
