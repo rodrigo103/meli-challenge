@@ -1,7 +1,7 @@
 package com.example.myandroidapp.di
 
 import com.example.myandroidapp.analytics.AnalyticsHelper
-import com.example.myandroidapp.analytics.TimberAnalyticsHelper
+import com.example.myandroidapp.analytics.FirebaseAnalyticsHelper
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,5 +14,5 @@ abstract class AnalyticsModule {
 
     @Binds
     @Singleton
-    abstract fun bindAnalyticsHelper(impl: TimberAnalyticsHelper): AnalyticsHelper
+    abstract fun bindAnalyticsHelper(impl: FirebaseAnalyticsHelper): AnalyticsHelper
 }
