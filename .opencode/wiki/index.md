@@ -26,6 +26,7 @@ Base de conocimiento persistente del proyecto, mantenida por opencode.
 
 - [[tools/retrofit-setup]] — Retrofit + OkHttp + kotlinx.serialization
 - [[tools/hilt-setup]] — Hilt DI + módulos
+- [[tools/detekt-setup]] — Detekt: static analysis, Compose rules, baseline, CI
 - [[tools/key-dependencies]] — Resumen de dependencias clave
 
 ## Meta
