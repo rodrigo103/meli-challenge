@@ -61,8 +61,6 @@ sonarqube {
     property("sonar.projectKey", "rodrigo103_proyecto-android")
     property("sonar.organization", "rodrigo103")
     property("sonar.host.url", "https://sonarcloud.io")
-    property("sonar.sources", "src/main")
-    property("sonar.tests", "src/test")
   }
 }
 
