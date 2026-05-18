@@ -35,19 +35,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -62,12 +57,11 @@ import com.example.myandroidapp.data.Article
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticlesListScreen(
-    onArticleClick: (Int) -> Unit,
+    attributes: ArticlesListAttributes,
+    actions: ArticlesListActions,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: ArticlesListViewModel = hiltViewModel()
-    val articles = viewModel.articles.collectAsLazyPagingItems()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val articles = attributes.articles.collectAsLazyPagingItems()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(articles.loadState) {
@@ -133,16 +127,16 @@ fun ArticlesListScreen(
                     SearchBar(
                         inputField = {
                             SearchBarDefaults.InputField(
-                                query = searchQuery,
-                                onQueryChange = viewModel::onSearchTextChange,
+                                query = attributes.searchQuery,
+                                onQueryChange = actions.onSearchTextChange,
                                 onSearch = {},
                                 expanded = false,
                                 onExpandedChange = {},
                                 placeholder = { Text("Search articles...") },
                                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                                 trailingIcon = {
-                                    if (searchQuery.isNotEmpty()) {
-                                        IconButton(onClick = { viewModel.clearSearch() }) {
+                                    if (attributes.searchQuery.isNotEmpty()) {
+                                        IconButton(onClick = actions.onClearSearch) {
                                             Icon(Icons.Default.Close, contentDescription = "Clear")
                                         }
                                     }
@@ -162,7 +156,7 @@ fun ArticlesListScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = if (searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                                text = if (attributes.searchQuery.isNotEmpty()) "No results found" else "No articles available",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -181,7 +175,10 @@ fun ArticlesListScreen(
                                 if (article != null) {
                                     articleCardSettings(
                                         article = article,
-                                        onClick = { onArticleClick(article.id) },
+                                        onClick = {
+                                            actions.sendAnalytics("article_selected", mapOf("id" to article.id.toString()))
+                                            actions.onArticleClick(article.id)
+                                        },
                                     )()
                                 }
                             }

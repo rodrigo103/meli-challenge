@@ -22,6 +22,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myandroidapp.data.Article
 import com.example.myandroidapp.data.ArticlesRepository
 import com.example.myandroidapp.ui.articles.detail.articleDetailContentSettings
+import com.example.myandroidapp.ui.articles.list.ArticlesListActions
+import com.example.myandroidapp.ui.articles.list.ArticlesListAttributes
 import com.example.myandroidapp.ui.articles.list.ArticlesListScreen
 import com.example.myandroidapp.ui.articles.list.ArticlesListViewModel
 
@@ -31,14 +33,22 @@ fun DualPaneScreen(
     modifier: Modifier = Modifier,
 ) {
     val listViewModel: ArticlesListViewModel = hiltViewModel()
+    val searchQuery by listViewModel.searchQuery.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.weight(1f)) {
             Box(modifier = Modifier.weight(0.4f).fillMaxSize()) {
                 ArticlesListScreen(
-                    onArticleClick = { articleId ->
-                        listViewModel.onArticleSelected(articleId)
-                    },
+                    attributes = ArticlesListAttributes(
+                        searchQuery = searchQuery,
+                        articles = listViewModel.articles,
+                    ),
+                    actions = ArticlesListActions(
+                        onSearchTextChange = listViewModel::onSearchTextChange,
+                        onClearSearch = listViewModel::clearSearch,
+                        onArticleClick = { listViewModel.onArticleSelected(it) },
+                        sendAnalytics = listViewModel::sendAnalytics,
+                    ),
                     modifier = Modifier.fillMaxSize(),
                 )
             }

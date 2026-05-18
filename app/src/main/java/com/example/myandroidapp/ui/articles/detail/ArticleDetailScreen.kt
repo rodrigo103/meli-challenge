@@ -31,8 +31,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -45,26 +43,24 @@ import com.example.myandroidapp.ui.UiState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailScreen(
-    onBack: () -> Unit,
+    attributes: ArticleDetailAttributes,
+    actions: ArticleDetailActions,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: ArticleDetailViewModel = hiltViewModel()
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text("Article Details") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = actions.onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
             )
         },
     ) { padding ->
-        when (val current = state) {
+        when (val current = attributes.state) {
             is UiState.Loading -> {
                 Box(
                     modifier = Modifier

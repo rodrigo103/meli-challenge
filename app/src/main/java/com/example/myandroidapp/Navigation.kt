@@ -4,20 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myandroidapp.ui.articles.detail.ArticleDetailScreen
-import com.example.myandroidapp.ui.articles.list.ArticlesListScreen
+import com.example.myandroidapp.ui.articles.detail.ArticleDetailScreenRoute
+import com.example.myandroidapp.ui.articles.list.ArticlesListScreenRoute
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = ArticlesRoute) {
         composable<ArticlesRoute> {
-            ArticlesListScreen(onArticleClick = { articleId ->
-                navController.navigate(DetailRoute(articleId))
-            })
+            ArticlesListScreenRoute(
+                onArticleClick = { articleId ->
+                    navController.navigate(DetailRoute(articleId))
+                }
+            )
         }
         composable<DetailRoute> {
-            ArticleDetailScreen(
+            ArticleDetailScreenRoute(
                 onBack = { navController.popBackStack() }
             )
         }

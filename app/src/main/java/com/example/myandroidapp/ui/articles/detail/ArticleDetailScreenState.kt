@@ -1,0 +1,11 @@
+package com.example.myandroidapp.ui.articles.detail
+
+import com.example.myandroidapp.ui.UiState
+
+data class ArticleDetailAttributes(
+    val state: UiState<ArticleDetailState>,
+)
+
+data class ArticleDetailActions(
+    val onBack: () -> Unit,
+)

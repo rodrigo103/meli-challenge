@@ -54,6 +54,9 @@ class ArticlesListViewModel @Inject constructor(
 
     fun onArticleSelected(id: Int) {
         _selectedArticleId.value = id
-        analytics.logEvent("article_selected", mapOf("id" to id.toString()))
+    }
+
+    fun sendAnalytics(event: String, properties: Map<String, String>) {
+        analytics.logEvent(event, properties)
     }
 }
