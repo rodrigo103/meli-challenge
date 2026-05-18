@@ -5,7 +5,6 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.example.myandroidapp.data.ApiService
-import com.example.myandroidapp.data.extractBody
 import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalPagingApi::class)
@@ -30,8 +29,7 @@ class ArticleRemoteMediator(
 
         return try {
             val response = apiService.getArticles(limit = PAGE_SIZE, offset = offset)
-            val body = response.extractBody()
-            val articles = body.results
+            val articles = response.results
             articleDao.insertAll(articles.map { it.toEntity() })
             MediatorResult.Success(endOfPaginationReached = articles.size < PAGE_SIZE)
         } catch (e: CancellationException) {

@@ -1,6 +1,7 @@
 package com.example.myandroidapp.di
 
 import com.example.myandroidapp.data.ApiService
+import com.example.myandroidapp.data.HttpErrorCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +39,7 @@ object NetworkModule {
             .baseUrl("https://api.spaceflightnewsapi.net/v4/")
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addCallAdapterFactory(HttpErrorCallAdapterFactory())
             .build()
     }
 

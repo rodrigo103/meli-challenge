@@ -1,6 +1,6 @@
 # Data Layer
 
-> **Last verified:** 2026-05-17 | **Verified by:** [source]
+> **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `extractBody()` reemplazado por `CallAdapter.Factory`
 
 Data layer del proyecto. Sigue patrón Repository con dos fuentes: API remota (Retrofit) y base local (Room).
 
@@ -8,15 +8,16 @@ Data layer del proyecto. Sigue patrón Repository con dos fuentes: API remota (R
 
 ```
 ApiService (Retrofit)
-    ├── GET /articles/?limit=&offset=&search=
-    └── GET /articles/{id}/
+    ├── GET /articles/?limit=&offset=&search=  → ArticleResponse
+    └── GET /articles/{id}/                     → Article
 ```
 
 - Base URL: `https://api.spaceflightnewsapi.net/v4`
 - `OkHttpClient` con logging interceptor en debug
 - `kotlinx.serialization` converter (no Gson)
-- `HttpErrorCallAdapter` — custom CallAdapter.Factory que wrappea errores HTTP en `ApiException` [source]
-- `ResponseExt` — extensiones para parsear `Response<T>` a `Result<T>` con `ApiException` [source]
+- `HttpErrorCallAdapterFactory` — `CallAdapter.Factory` registrado en `NetworkModule`. Intercepta `enqueue()` y convierte respuestas no-2xx en `ApiException` (BadRequest, Unauthorized, NotFound, Conflict, ServerError) o `IOException`. [source]
+- APIs devuelven dominio directo (`ArticleResponse`, `Article`), no `Response<T>`. El error handling es automático via `CallAdapter`.
+- `ResponseExt.kt` fue eliminado — ya no se necesita `extractBody()`.
 
 ## Room layer
 
@@ -37,9 +38,11 @@ ApiService (Retrofit)
 ## Repository pattern
 
 `ArticlesRepository` orquesta las fuentes [source]:
-- `getArticles()` → `Flow<PagingData<Article>>` (vía RemoteMediator)
-- `searchArticles(query)` → `Flow<PagingData<Article>>` (búsqueda con RemoteMediator)
-- `getArticleById(id)` → `Result<Article>` (primero Room, si falla API)
+- `getArticles(limit, offset)` → `Result<List<Article>>` (via `apiService.getArticles(...).results`)
+- `searchArticles(query, limit)` → `Result<List<Article>>` (via `apiService.getArticles(...).results`)
+- `getArticle(id)` → `Result<Article>` (via `apiService.getArticle(id)`)
+- `getArticlesPaged(searchQuery?)` → `Flow<PagingData<Article>>` (via RemoteMediator + Room)
+- Errores capturados con `runCatching { ... }.onFailure { Timber.e(...) }`
 
 ## DataStore Preferences
 

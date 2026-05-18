@@ -1,6 +1,6 @@
 # App Structure
 
-> **Last verified:** 2026-05-17 | **Verified by:** [source]
+> **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `HttpErrorCallAdapter.kt` activado
 
 Estructura del módulo `:app` en el proyecto `MyAndroidApp`. App monomódulo con Jetpack Compose.
 
@@ -17,15 +17,14 @@ com.example.myandroidapp/
 │   ├── DatabaseModule.kt         # Room database + DAOs
 │   ├── DataStoreModule.kt        # DataStore preferences provider
 │   ├── DispatcherModule.kt       # Coroutine dispatchers
-│   ├── NetworkModule.kt          # OkHttp + Retrofit
+│   ├── NetworkModule.kt          # OkHttp + Retrofit + HttpErrorCallAdapterFactory
 │   ├── RepositoryModule.kt       # Repository bindings
 │   └── AnalyticsModule.kt        # AnalyticsHelper binding
 ├── data/
 │   ├── Article.kt                # Domain model + API response
-│   ├── ApiService.kt             # Retrofit interface (articles)
-│   ├── ApiException.kt           # HTTP error exception type
-│   ├── ResponseExt.kt            # Extension to handle Response
-│   ├── HttpErrorCallAdapter.kt   # Custom CallAdapter for HTTP errors
+│   ├── ApiService.kt             # Retrofit interface (domain types, no Response<T>)
+│   ├── ApiException.kt           # HTTP error sealed exception hierarchy
+│   ├── HttpErrorCallAdapter.kt   # CallAdapter.Factory — intercepta non-2xx → ApiException
 │   ├── ArticlesRepository.kt     # Repository (API + Room)
 │   ├── local/
 │   │   ├── AppDatabase.kt        # Room database definition
@@ -66,3 +65,4 @@ com.example.myandroidapp/
 - Kotlin 17 toolchain
 - 100% Kotlin (no Java)
 - Jetpack Compose + Material 3
+- Error handling automático via `CallAdapter.Factory` (no `Response<T>` manual checks)

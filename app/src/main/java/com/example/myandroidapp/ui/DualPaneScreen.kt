@@ -27,6 +27,7 @@ import com.example.myandroidapp.ui.articles.list.ArticlesListAttributes
 import com.example.myandroidapp.ui.articles.list.ArticlesListScreen
 import com.example.myandroidapp.ui.articles.list.ArticlesListViewModel
 
+@Suppress("ViewModelInjection")
 @Composable
 fun DualPaneScreen(
     repository: ArticlesRepository,
@@ -37,7 +38,7 @@ fun DualPaneScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         Row(modifier = Modifier.weight(1f)) {
-            Box(modifier = Modifier.weight(0.4f).fillMaxSize()) {
+            Box(modifier = Modifier.weight(LIST_WEIGHT).fillMaxSize()) {
                 ArticlesListScreen(
                     attributes = ArticlesListAttributes(
                         searchQuery = searchQuery,
@@ -53,7 +54,7 @@ fun DualPaneScreen(
                 )
             }
             VerticalDivider(modifier = Modifier.fillMaxHeight())
-            Box(modifier = Modifier.weight(0.6f).fillMaxSize()) {
+            Box(modifier = Modifier.weight(DETAIL_WEIGHT).fillMaxSize()) {
                 val selectedArticleId by listViewModel.selectedArticleId.collectAsStateWithLifecycle()
                 DetailPane(
                     articleId = selectedArticleId,
@@ -63,6 +64,9 @@ fun DualPaneScreen(
         }
     }
 }
+
+private const val LIST_WEIGHT = 0.4f
+private const val DETAIL_WEIGHT = 0.6f
 
 @Composable
 private fun DetailPane(

@@ -31,21 +31,21 @@ class DefaultArticlesRepository @Inject constructor(
 ) : ArticlesRepository {
     override suspend fun getArticles(limit: Int, offset: Int): Result<List<Article>> =
         runCatching {
-            apiService.getArticles(limit = limit, offset = offset).extractBody().results
+            apiService.getArticles(limit = limit, offset = offset).results
         }.onFailure {
             Timber.e(it, "Error fetching articles")
         }
 
     override suspend fun searchArticles(query: String, limit: Int): Result<List<Article>> =
         runCatching {
-            apiService.getArticles(limit = limit, offset = 0, search = query).extractBody().results
+            apiService.getArticles(limit = limit, offset = 0, search = query).results
         }.onFailure {
             Timber.e(it, "Error searching articles with query: %s", query)
         }
 
     override suspend fun getArticle(id: Int): Result<Article> =
         runCatching {
-            apiService.getArticle(id).extractBody()
+            apiService.getArticle(id)
         }.onFailure {
             Timber.e(it, "Error fetching article with id: %d", id)
         }

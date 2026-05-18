@@ -51,6 +51,10 @@ Después de resolver un problema no trivial, compilar conocimiento al wiki si se
 - Un patrón reusable o gotcha descubierto
 - Configuración de herramientas
 
+**IMPORTANTE**: Después de cambios significativos (arquitectura, API contracts, DI, error handling, nuevas dependencias), **revisá si las páginas del wiki necesitan actualizarse**. Buscá archivos mencionados en el wiki (`grep` de nombres de archivo en `.opencode/wiki/`). Si encontrás referencias a código que cambió o se eliminó, actualizá la página y agregá entrada en `log.md`.
+
+El skill `check-commit` incluye un paso de wiki review antes del commit.
+
 Hacer `/wiki ingest` para procesar archivos en `raw/` o `/wiki ingest <topic>` para compilar conocimiento desde el codebase.
 
 ## Formato de páginas
