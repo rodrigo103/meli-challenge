@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,14 +15,12 @@ class FirebaseAnalyticsHelper @Inject constructor(
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
     override fun logEvent(name: String, params: Map<String, String>) {
-        Timber.tag("Analytics").d("Event: %s | params: %s", name, params)
         firebaseAnalytics.logEvent(name) {
             params.forEach { (key, value) -> param(key, value) }
         }
     }
 
     override fun logError(throwable: Throwable, context: String) {
-        Timber.tag("Analytics").e(throwable, "Error: %s", context)
         firebaseAnalytics.logEvent("app_error") {
             param("context", context)
             param("error", throwable.message ?: "Unknown")
@@ -31,7 +28,6 @@ class FirebaseAnalyticsHelper @Inject constructor(
     }
 
     override fun logScreenView(screenName: String) {
-        Timber.tag("Analytics").d("Screen View: %s", screenName)
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
             param(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
         }

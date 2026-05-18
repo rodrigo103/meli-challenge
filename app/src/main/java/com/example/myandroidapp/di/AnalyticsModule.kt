@@ -1,18 +1,25 @@
 package com.example.myandroidapp.di
 
 import com.example.myandroidapp.analytics.AnalyticsHelper
+import com.example.myandroidapp.analytics.CompositeAnalyticsHelper
 import com.example.myandroidapp.analytics.FirebaseAnalyticsHelper
-import dagger.Binds
+import com.example.myandroidapp.analytics.TimberAnalyticsHelper
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AnalyticsModule {
+object AnalyticsModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindAnalyticsHelper(impl: FirebaseAnalyticsHelper): AnalyticsHelper
+    fun bindAnalyticsHelper(
+        firebase: FirebaseAnalyticsHelper,
+        timber: TimberAnalyticsHelper,
+    ): AnalyticsHelper {
+        return CompositeAnalyticsHelper(listOf(firebase, timber))
+    }
 }
