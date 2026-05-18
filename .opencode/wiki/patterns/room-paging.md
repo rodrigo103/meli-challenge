@@ -1,3 +1,13 @@
+---
+tags:
+  - wiki/pattern
+---
+
+---
+tags:
+  - wiki/pattern
+---
+
 # Room + Paging 3 + RemoteMediator
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]

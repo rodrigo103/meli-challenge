@@ -1,3 +1,8 @@
+---
+tags:
+  - wiki/pattern
+---
+
 # MVVM + Repository Pattern
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]

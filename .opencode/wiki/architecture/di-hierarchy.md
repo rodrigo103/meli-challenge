@@ -1,3 +1,13 @@
+---
+tags:
+  - wiki/architecture
+---
+
+---
+tags:
+  - wiki/architecture
+---
+
 # DI Hierarchy
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]

@@ -1,3 +1,8 @@
+---
+tags:
+  - wiki/tool
+---
+
 # Hilt Setup
 
 > **Last verified:** 2026-05-17 | **Verified by:** [source]
