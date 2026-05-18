@@ -63,8 +63,6 @@ sonarqube {
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.sources", "src/main/java")
     property("sonar.tests", "src/test/java, src/androidTest/java")
-    property("sonar.java.binaries", "build/intermediates/classes/debug")
-    property("sonar.java.test.binaries", "build/intermediates/classes/test/debug")
     property("sonar.android.lint.report", "build/reports/lint-results-debug.xml")
   }
 }
