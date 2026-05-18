@@ -1,7 +1,6 @@
 ---
 name: check-commit
-description: "Run detekt + unit tests, then commit with a structured message. Usage: /check-commit"
-user-invocable: true
+description: "Run detekt + unit tests, then commit with a structured message. Trigger when the user asks to commit, comitear, or hacer commit."
 allowed-tools: Bash, Read, Glob, Write, Edit
 ---
 
