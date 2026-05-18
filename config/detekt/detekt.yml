@@ -267,7 +267,7 @@ style:
     active: true
   MagicNumber:
     active: true
-    excludeNumbers:
+    ignoreNumbers:
       - '-1'
       - '0'
       - '1'
@@ -375,7 +375,7 @@ style:
     excludeImports:
       - 'java.util.*'
 
-TwitterCompose:
+compose:
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:
