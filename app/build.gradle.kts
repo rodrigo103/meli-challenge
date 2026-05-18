@@ -66,7 +66,6 @@ sonarqube {
     property("sonar.android.lint.report", "build/reports/lint-results-debug.xml")
   }
 }
-}
 
 dependencies {
   implementation(libs.firebase.analytics)
