@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.hilt)
   alias(libs.plugins.ksp)
   alias(libs.plugins.detekt)
+  alias(libs.plugins.sonarcloud)
 }
 
 android {
@@ -51,6 +52,19 @@ detekt {
   baseline = file("detekt-baseline.xml")
   buildUponDefaultConfig = true
   allRules = false
+}
+
+sonarqube {
+  properties {
+    property("sonar.projectKey", "rodrigo103_proyecto-android")
+    property("sonar.organization", "rodrigo103")
+    property("sonar.host.url", "https://sonarcloud.io")
+    property("sonar.sources", "src/main")
+    property("sonar.tests", "src/test, src/androidTest")
+    property("sonar.java.binaries", "build/intermediates/classes/debug")
+    property("sonar.java.test.binaries", "build/intermediates/classes/test/debug")
+    property("sonar.android.lint.report", "build/reports/lint-results-debug.xml")
+  }
 }
 
 dependencies {

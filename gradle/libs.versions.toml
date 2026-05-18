@@ -29,6 +29,7 @@ room = "2.7.1"
 paging = "3.3.5"
 detekt = "1.23.8"
 detektComposeRules = "0.4.2"
+sonarcloud = "5.1.0.4882"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -84,3 +85,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version = "2.3.8" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+sonarcloud = { id = "org.sonarqube", version.ref = "sonarcloud" }
