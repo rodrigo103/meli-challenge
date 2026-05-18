@@ -30,15 +30,18 @@ App Android con Jetpack Compose, MVVM + Repository pattern, Hilt DI, Room, Retro
 
 El proyecto tiene un wiki persistente en `.opencode/wiki/` que opencode mantiene incrementalmente.
 
-## Cuándo leer el wiki
+## Cuándo leer el wiki — ¡OBLIGATORIO!
 
-Antes de responder sobre:
+**Siempre, sin excepción, leé la wiki ANTES de responder cualquier consulta.**
+Esto aplica incluso para tareas de código — consultá la página relevante antes de editar.
+
+Categorías cubiertas:
 - Arquitectura del proyecto (módulos, DI, capas)
 - Procesos (build, test, PR workflow)
 - Patrones (MVVM, error handling, Room + Paging)
 - Herramientas (Retrofit, Hilt, Coil)
 
-Hacer `/wiki search <tema>` o buscar directamente en `.opencode/wiki/`.
+Hacer `/wiki search <tema>` o leer directamente en `.opencode/wiki/`.
 
 ## Cuándo escribir al wiki
 
