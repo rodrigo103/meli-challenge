@@ -23,16 +23,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +48,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import kotlin.math.tan
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -72,101 +80,113 @@ fun ArticlesListScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(title = { Text("Space Flight News") })
+            TopAppBar(
+                title = { Text("Space Flight News") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
-        when (val refreshState = articles.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
-                    LottieAnimation(
-                        composition = composition,
-                        modifier = Modifier.size(160.dp),
-                        iterations = LottieConstants.IterateForever,
-                    )
-                }
-            }
-
-            is LoadState.Error -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = refreshState.error.message ?: "Unknown error",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    androidx.compose.material3.Button(
-                        onClick = { articles.retry() }
+        GradientBackground(
+            topColor = MaterialTheme.colorScheme.primaryContainer,
+            bottomColor = MaterialTheme.colorScheme.inverseOnSurface,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            when (val refreshState = articles.loadState.refresh) {
+                is LoadState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text("Retry")
+                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.space_loading))
+                        LottieAnimation(
+                            composition = composition,
+                            modifier = Modifier.size(160.dp),
+                            iterations = LottieConstants.IterateForever,
+                        )
                     }
                 }
-            }
 
-            else -> {
-                Column(modifier = Modifier.padding(padding)) {
-                    TextField(
-                        value = attributes.searchQuery,
-                        onValueChange = actions.onSearchTextChange,
+                is LoadState.Error -> {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        placeholder = { Text("Search articles...") },
-                        singleLine = true,
-                    )
-
-                    if (articles.itemCount == 0 && articles.loadState.refresh is LoadState.NotLoading) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
+                            .fillMaxSize()
+                            .padding(padding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = refreshState.error.message ?: "Unknown error",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        androidx.compose.material3.Button(
+                            onClick = { articles.retry() }
                         ) {
-                            Text(
-                                text = if (attributes.searchQuery.isNotEmpty()) "No results found" else "No articles available",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            Text("Retry")
                         }
-                    } else {
-                        LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            items(
-                                count = articles.itemCount,
-                                key = articles.itemKey { it.id },
-                                contentType = articles.itemContentType { "article" },
-                            ) { index ->
-                                val article = articles[index]
-                                if (article != null) {
-                                    articleCardSettings(
-                                        article = article,
-                                        onClick = {
-                                            actions.sendAnalytics("article_selected", mapOf("id" to article.id.toString()))
-                                            actions.onArticleClick(article.id)
-                                        },
-                                    )()
-                                }
+                    }
+                }
+
+                else -> {
+                    Column(modifier = Modifier.padding(padding)) {
+                        TextField(
+                            value = attributes.searchQuery,
+                            onValueChange = actions.onSearchTextChange,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            placeholder = { Text("Search articles...") },
+                            singleLine = true,
+                        )
+
+                        if (articles.itemCount == 0 && articles.loadState.refresh is LoadState.NotLoading) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = if (attributes.searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
-                            if (articles.loadState.append is LoadState.Loading) {
-                                item {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        } else {
+                            LazyColumn(
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                items(
+                                    count = articles.itemCount,
+                                    key = articles.itemKey { it.id },
+                                    contentType = articles.itemContentType { "article" },
+                                ) { index ->
+                                    val article = articles[index]
+                                    if (article != null) {
+                                        articleCardSettings(
+                                            article = article,
+                                            onClick = {
+                                                actions.sendAnalytics("article_selected", mapOf("id" to article.id.toString()))
+                                                actions.onArticleClick(article.id)
+                                            },
+                                        )()
+                                    }
+                                }
+                                if (articles.loadState.append is LoadState.Loading) {
+                                    item {
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                        }
                                     }
                                 }
                             }
@@ -174,6 +194,52 @@ fun ArticlesListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun GradientBackground(
+    topColor: Color,
+    bottomColor: Color,
+    containerColor: Color,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val currentTopColor by rememberUpdatedState(topColor)
+    val currentBottomColor by rememberUpdatedState(bottomColor)
+    Surface(
+        color = containerColor,
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .drawWithCache {
+                    val offset = size.height * tan(Math.toRadians(11.06).toFloat())
+                    val start = Offset(size.width / 2 + offset / 2, 0f)
+                    val end = Offset(size.width / 2 - offset / 2, size.height)
+
+                    val topGradient = Brush.linearGradient(
+                        0f to currentTopColor,
+                        0.724f to Color.Transparent,
+                        start = start,
+                        end = end,
+                    )
+                    val bottomGradient = Brush.linearGradient(
+                        0.2552f to Color.Transparent,
+                        1f to currentBottomColor,
+                        start = start,
+                        end = end,
+                    )
+
+                    onDrawBehind {
+                        drawRect(topGradient)
+                        drawRect(bottomGradient)
+                    }
+                },
+        ) {
+            content()
         }
     }
 }
