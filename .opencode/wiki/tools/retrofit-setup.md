@@ -55,3 +55,43 @@ El error se propaga al Repository, que lo captura con `Result.runCatching {}`.
 1. Provee `OkHttpClient` con logging interceptor
 2. Provee `Retrofit` con base URL + kotlinx serialization converter + `HttpErrorCallAdapterFactory()`
 3. Provee `ApiService` implementado por Retrofit
+
+## Logging interceptor condicional
+
+```kotlin
+@Provides @Singleton
+fun provideOkHttpClient(@Named("isDebug") isDebug: Boolean): OkHttpClient {
+    val logging = HttpLoggingInterceptor().apply {
+        level = if (isDebug) BODY else BASIC
+    }
+    return OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("origin", "android")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+}
+```
+
+En debug se loguean bodies completos. En release solo headers para no exponer datos sensibles.
+
+## Dual CallAdapter strategy
+
+Para soportar tanto coroutines como RxJava2:
+
+```kotlin
+val retrofit = Retrofit.Builder()
+    .addCallAdapterFactory(HttpErrorCallAdapterFactory())
+    .addConverterFactory(kotlinxSerializationConverter(json))
+    .baseUrl(BASE_URL)
+    .client(okHttpClient)
+    .build()
+```
+
+## Ver también
+
+- [[patterns/error-handling]] — Error handling + ApiException hierarchy
+- [[tools/testing-strategy]] — Testing con MockWebServer

@@ -1,5 +1,31 @@
 # Changelog del Wiki
 
+## 2026-05-19 (3)
+
+- Updated [[processes/build-and-test]] — SonarCloud movido de "CI avanzado (a futuro)" a sección propia con descripción del workflow real
+- Updated [[patterns/mvvm-repository]] — "Cache optimista" reemplazado por "Stale-while-revalidate via Paging 3", descripción del patrón real implementado con RemoteMediator + Room. Eliminados duplicados.
+
+## 2026-05-19 (2)
+
+- Batch wiki update: ingested content from deleted `.md` files into wiki pages
+  - **Created 5 new pages:**
+    - [[architecture/clean-architecture-guide]] — Clean Architecture 3 capas, regla de dependencia, use cases
+    - [[patterns/search-strategy]] — Búsqueda local vs API: decisión arquitectónica, combine+flatMapLatest
+    - [[patterns/settings-composable]] — Settings+Composable pattern, color interfaces, typography system
+    - [[processes/tech-defense-guide]] — Guía de defensa técnica: Hilt, Navigation, testing, errores
+    - [[tools/testing-strategy]] — Testing: MockK, MockWebServer, Turbine, semantic properties, fakes
+  - **Updated 8 existing pages:**
+    - [[patterns/attributes-actions]] — Expanded analytics section, removed external references
+    - [[patterns/error-handling]] — Added timeout pattern, retry pattern, error hierarchy, ver también
+    - [[patterns/room-paging]] — Added indices, chunked inserts, cache check, combine+flatMapLatest
+    - [[patterns/mvvm-repository]] — Added use cases, cache optimista, operator fun invoke
+    - [[architecture/di-hierarchy]] — Added ViewModel multibinding, multi-environment factory, scopes
+    - [[tools/retrofit-setup]] — Added logging interceptor condicional, ver también links
+    - [[tools/key-dependencies]] — Added decision tables: Coil/Glide, kotlinx/Gson, StateFlow/LiveData, TOML/buildSrc
+    - [[processes/build-and-test]] — Added CI avanzado patterns (MobSF, release train, GMD)
+  - **Updated [[index]]** — Cleaned duplicates, added new pages, removed stale descriptions
+- Deleted source files from working tree: 17 `.md` files removed (analisis-*, decision-*, defensa-*, patron-*, plan-*, ranking-*)
+
 ## 2026-05-19
 
 - Removed `data/preferences/AppPreferences` and `di/DataStoreModule` — no se consumía (`lastOpenedArticleId` sin lectores, `isDarkMode` sin uso)

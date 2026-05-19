@@ -62,3 +62,58 @@ fun loadArticle(id: Int) {
 
 - `MyApplication` tiene `Thread.setDefaultUncaughtExceptionHandler`
 - LeakCanary en debug captura memory leaks
+
+## Timeout pattern
+
+Para operaciones que pueden colgarse, usar `withTimeoutOrNull`:
+
+```kotlin
+val success = withTimeoutOrNull(30_000L) {
+    repository.fetchArticles()
+}
+if (success == null) {
+    _uiState.value = UiState.Error("Tiempo de espera agotado. Verificá tu conexión.")
+}
+```
+
+El botón de retry reinicia el flujo completo.
+
+## Retry pattern
+
+```kotlin
+fun retry() {
+    loadArticles()  // reinicia el flow desde el principio
+}
+```
+
+## Error handling jerárquico
+
+La jerarquía de excepciones de red permite manejo granular:
+
+```kotlin
+sealed class ApiException(code: Int, message: String) : Exception(message) {
+    class BadRequest(message: String) : ApiException(400, message)
+    class Unauthorized(message: String) : ApiException(401, message)
+    class NotFound(message: String) : ApiException(404, message)
+    class Conflict(message: String) : ApiException(409, message)
+    class ServerError(code: Int, message: String) : ApiException(code, message)
+    class NetworkError(cause: Throwable) : ApiException(0, cause.message ?: "Network error")
+}
+```
+
+Esto permite al ViewModel reaccionar distinto según el tipo de error:
+
+```kotlin
+repository.getArticle(id)
+    .onSuccess { _uiState.value = UiState.Success(it) }
+    .onFailure { when (it) {
+        is ApiException.NotFound -> _uiState.value = UiState.Error("Artículo no encontrado")
+        is ApiException.ServerError -> _uiState.value = UiState.Error("Error del servidor. Intenta más tarde.")
+        else -> _uiState.value = UiState.Error("Error de conexión")
+    }}
+```
+
+## Ver también
+
+- [[tools/retrofit-setup]] — HTTP error handling via CallAdapter
+- [[tools/testing-strategy]] — Testing de errores con MockWebServer

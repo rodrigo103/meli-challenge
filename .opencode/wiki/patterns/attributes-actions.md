@@ -14,7 +14,7 @@ tags:
 
 ## Qué es
 
-Patrón de UI tomado de Ualá (Abra design system) donde los composables de pantalla reciben dos parámetros tipados:
+Patrón de UI donde los composables de pantalla reciben dos parámetros tipados:
 
 - **`Attributes`** — data class inmutable con todo el estado/datos que la pantalla necesita
 - **`Actions`** — data class con todas las funciones callback que la pantalla puede disparar
@@ -107,7 +107,7 @@ ViewModel (Hilt)
 
 ## Analytics en Actions
 
-Siguiendo el patrón de Ualá, el `sendAnalytics` se pasa desde el ViewModel via Actions:
+El `sendAnalytics` se pasa desde el ViewModel via Actions:
 
 ```kotlin
 // ViewModel: wrapper público

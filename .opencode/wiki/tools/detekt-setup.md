@@ -39,7 +39,7 @@ detekt {
 
 ## Config file
 
-`config/detekt/detekt.yml` — custom ruleset inspired by Ualá, ~410 lines con reglas para:
+`config/detekt/detekt.yml` — custom ruleset, ~410 lines con reglas para:
 
 | Categoría | Reglas clave |
 |---|---|

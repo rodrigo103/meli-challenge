@@ -40,6 +40,48 @@ AppModule (isDebug)
 - `MainActivity` — `@AndroidEntryPoint`
 - `MyApplication` — `@HiltAndroidApp`
 
+## ViewModel multibinding
+
+A escala, se puede usar `@IntoMap` + `@ViewModelKey` para registrar ViewModels automáticamente:
+
+```kotlin
+@Module
+abstract class ViewModelModule {
+    @Binds @IntoMap @ViewModelKey(ArticlesViewModel::class)
+    abstract fun bindArticlesViewModel(viewModel: ArticlesViewModel): ViewModel
+
+    @Binds @IntoMap @ViewModelKey(DetailViewModel::class)
+    abstract fun bindDetailViewModel(viewModel: DetailViewModel): ViewModel
+}
+```
+
+## Multi-environment Factory Pattern
+
+Para apps que necesitan comportamientos distintos según país/entorno:
+
+```
+interface EnvironmentFactory {
+    fun provideApiClient(): RetrofitApiClient
+    fun provideAuthInterceptor(): Interceptor
+}
+
+class EnvironmentFactoryProd : EnvironmentFactory { /* API real */ }
+class EnvironmentFactoryDemo : EnvironmentFactory { /* mock API */ }
+```
+
+Cada entorno tiene su propia autenticación, endpoints y reglas de negocio. El Abstract Factory pattern permite switchear todo sin `if/else`.
+
+## Scopes custom
+
+Para componentes con ciclo de vida propio (ej: sesión de usuario):
+
+```kotlin
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SessionScope
+```
+
 ## Ver también
 
 - [[tools/hilt-setup]] — Detalles de los módulos Hilt
+- [[architecture/clean-architecture-guide]] — Clean Architecture
