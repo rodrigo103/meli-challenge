@@ -45,7 +45,8 @@ Sistema de analytics con patrón **Composite** que despacha eventos a múltiples
 
 Eventos trackeados: `screen_view`, `article_selected`, `article_loaded`, `app_error`. El `AnalyticsHelper` se inyecta como interfaz, manteniendo el dominio libre de dependencias de Firebase.
 
-![[Pasted image 20260519054829.png]]
+![Firebase Analytics Dashboard](screenshots/firebase-analytics.png)
+
 ### 🧠 Wiki LLM integrada con OpenCode
 
 Inspirada en la metodología de documentación de Kharpaty, el proyecto incluye una **wiki persistente** en `.opencode/wiki/` que funciona como:
