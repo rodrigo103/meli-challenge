@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -39,6 +40,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("No articles available").assertIsDisplayed()
     }
 
@@ -61,6 +63,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("SpaceX Launches Starship").assertIsDisplayed()
         composeTestRule.onNodeWithText("NASA Mars Rover Update").assertIsDisplayed()
     }
@@ -84,7 +87,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Search articles...").performTextInput("mars")
+        composeTestRule.onNodeWithText("Search articles\u2026").performTextInput("mars")
 
         assertEquals("mars", query)
     }
@@ -108,7 +111,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
-        composeTestRule.onNodeWithText("Clear").performClick()
+        composeTestRule.onNodeWithContentDescription("Clear search").performClick()
 
         assertEquals("", query)
     }
@@ -133,6 +136,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("SpaceX Launches Starship").performClick()
 
         assertEquals(1, clickedIds.size)
@@ -158,6 +162,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("No results found").assertIsDisplayed()
     }
 
@@ -180,6 +185,7 @@ class ArticlesListScreenInstrumentedTest {
             )
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Space.com").assertIsDisplayed()
         composeTestRule.onNodeWithText("NASA").assertIsDisplayed()
     }
