@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -53,10 +54,10 @@ fun ArticleDetailScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Article Details") },
+                title = { Text(stringResource(R.string.article_details)) },
                 navigationIcon = {
                     IconButton(onClick = actions.onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
             )
@@ -136,8 +137,9 @@ internal fun ArticleDetailContent(article: Article, modifier: Modifier = Modifie
         Spacer(modifier = Modifier.height(8.dp))
 
         if (article.authors.isNotEmpty()) {
+            val unknown = stringResource(R.string.unknown)
             Text(
-                text = "By ${article.authors.joinToString(", ") { it.name ?: "Unknown" }}",
+                text = stringResource(R.string.by_author, article.authors.joinToString(", ") { it.name ?: unknown }),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -157,7 +159,7 @@ internal fun ArticleDetailContent(article: Article, modifier: Modifier = Modifie
         article.publishedAt?.let {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Published: ${it.take(DATE_LENGTH)}",
+                text = stringResource(R.string.published_at, it.take(DATE_LENGTH)),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -176,7 +178,7 @@ internal fun ArticleDetailContent(article: Article, modifier: Modifier = Modifie
                 val intent = Intent(Intent.ACTION_VIEW, article.url.toUri())
                 context.startActivity(intent)
             }) {
-                Icon(Icons.Default.OpenInBrowser, contentDescription = "Open in browser")
+                Icon(Icons.Default.OpenInBrowser, contentDescription = stringResource(R.string.open_in_browser))
             }
         }
     }

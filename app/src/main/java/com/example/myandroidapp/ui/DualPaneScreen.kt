@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.myandroidapp.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myandroidapp.ui.articles.detail.ArticleDetailPaneViewModel
 import com.example.myandroidapp.ui.articles.detail.articleDetailContentSettings
@@ -74,7 +76,7 @@ private fun DetailPane(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "Select an article",
+                text = stringResource(R.string.select_an_article),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

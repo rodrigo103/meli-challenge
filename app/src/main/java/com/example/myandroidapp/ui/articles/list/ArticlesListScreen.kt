@@ -52,6 +52,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import androidx.compose.ui.res.stringResource
 import coil3.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -69,6 +70,7 @@ fun ArticlesListScreen(
 ) {
     val articles = attributes.articles.collectAsLazyPagingItems()
     val snackbarHostState = remember { SnackbarHostState() }
+    val unknownError = stringResource(R.string.unknown_error)
 
     LaunchedEffect(articles.loadState) {
         val error = when {
@@ -77,7 +79,7 @@ fun ArticlesListScreen(
             else -> null
         }
         error?.let {
-            snackbarHostState.showSnackbar(it.error.message ?: "Unknown error")
+            snackbarHostState.showSnackbar(it.error.message ?: unknownError)
         }
     }
 
@@ -86,7 +88,7 @@ fun ArticlesListScreen(
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("Space Flight News") },
+                title = { Text(stringResource(R.string.space_flight_news)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                 ),
@@ -106,13 +108,13 @@ fun ArticlesListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Search articles...") },
+                    placeholder = { Text(stringResource(R.string.search_articles)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.search),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
@@ -121,7 +123,7 @@ fun ArticlesListScreen(
                             IconButton(onClick = actions.onClearSearch) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear search",
+                                    contentDescription = stringResource(R.string.clear_search),
                                 )
                             }
                         }
@@ -160,7 +162,7 @@ fun ArticlesListScreen(
                             verticalArrangement = Arrangement.Center,
                         ) {
                             Text(
-                                text = refreshState.error.message ?: "Unknown error",
+                                text = refreshState.error.message ?: stringResource(R.string.unknown_error),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.error,
                             )
@@ -168,7 +170,7 @@ fun ArticlesListScreen(
                             androidx.compose.material3.Button(
                                 onClick = { articles.retry() }
                             ) {
-                                Text("Retry")
+                                Text(stringResource(R.string.retry))
                             }
                         }
                     }
@@ -180,7 +182,7 @@ fun ArticlesListScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
-                                    text = if (attributes.searchQuery.isNotEmpty()) "No results found" else "No articles available",
+                                    text = if (attributes.searchQuery.isNotEmpty()) stringResource(R.string.no_results_found) else stringResource(R.string.no_articles_available),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
