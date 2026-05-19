@@ -10,6 +10,18 @@
 
 ---
 
+## 📸 Capturas de pantalla
+
+<p align="center">
+  <img src="screenshots/phone-list.png" width="30%" alt="Teléfono — Lista" />
+  &nbsp;&nbsp;
+  <img src="screenshots/tablet-dual.png" width="63%" alt="Tablet — Dual pane" />
+  &nbsp;&nbsp;
+  <img src="screenshots/phone-error.png" width="30%" alt="Teléfono — Error" />
+</p>
+
+---
+
 ## ✨ Características destacadas
 
 ### 📱 Diseño responsivo y adaptativo
@@ -109,18 +121,6 @@ La wiki del proyecto cubre 5 categorías (arquitectura, patrones, procesos, herr
 - **Tests unitarios**: ViewModels con MockK + Turbine, repositorio con MockWebServer
 - **Tests instrumentados**: Compose UI tests en emulador
 - **Detekt** con reglas custom + reglas específicas de Compose
-
----
-
-## 📸 Capturas de pantalla
-
-<p align="center">
-  <img src="screenshots/phone-list.png" width="30%" alt="Teléfono — Lista" />
-  &nbsp;&nbsp;
-  <img src="screenshots/tablet-dual.png" width="63%" alt="Tablet — Dual pane" />
-  &nbsp;&nbsp;
-  <img src="screenshots/phone-error.png" width="30%" alt="Teléfono — Error" />
-</p>
 
 ---
 
