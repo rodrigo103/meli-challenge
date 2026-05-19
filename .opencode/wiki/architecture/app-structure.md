@@ -5,7 +5,7 @@ tags:
 
 # App Structure
 
-> **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `HttpErrorCallAdapter.kt` activado
+> **Last verified:** 2026-05-19 | **Verified by:** [source] — removed `DataStoreModule`, `AppPreferences`, `preferences/` directory
 
 Estructura del módulo `:app` en el proyecto `MyAndroidApp`. App monomódulo con Jetpack Compose.
 
@@ -18,9 +18,7 @@ com.example.myandroidapp/
 ├── Routes.kt                     # Route sealed class definitions
 ├── Navigation.kt                 # NavHost + NavController setup
 ├── di/
-│   ├── AppModule.kt              # Provider bindings (Context, DataStore)
-│   ├── DatabaseModule.kt         # Room database + DAOs
-│   ├── DataStoreModule.kt        # DataStore preferences provider
+│   ├── AppModule.kt              # Provider bindings (isDebug)
 │   ├── DispatcherModule.kt       # Coroutine dispatchers
 │   ├── NetworkModule.kt          # OkHttp + Retrofit + HttpErrorCallAdapterFactory
 │   ├── RepositoryModule.kt       # Repository bindings
@@ -38,9 +36,7 @@ com.example.myandroidapp/
 │   │   ├── ArticleEntity.kt
 │   │   ├── ArticleDao.kt
 │   │   └── ArticleRemoteMediator.kt
-│   └── preferences/
-│       └── AppPreferences.kt
-├── ui/
+│   ├── ui/
 │   ├── DualPaneScreen.kt         # Adaptive layout (list + detail, tablet)
 │   ├── ResponsiveApp.kt          # Window size-based routing (phone vs tablet)
 │   ├── articles/

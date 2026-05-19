@@ -5,7 +5,7 @@ tags:
 
 # Data Layer
 
-> **Last verified:** 2026-05-18 | **Verified by:** [source] — `ResponseExt.kt` eliminado, `extractBody()` reemplazado por `CallAdapter.Factory`
+> **Last verified:** 2026-05-19 | **Verified by:** [source] — removed `AppPreferences` / DataStore section
 
 Data layer del proyecto. Sigue patrón Repository con dos fuentes: API remota (Retrofit) y base local (Room).
 
@@ -48,8 +48,3 @@ ApiService (Retrofit)
 - `getArticle(id)` → `Result<Article>` (via `apiService.getArticle(id)`)
 - `getArticlesPaged(searchQuery?)` → `Flow<PagingData<Article>>` (via RemoteMediator + Room)
 - Errores capturados con `runCatching { ... }.onFailure { Timber.e(...) }`
-
-## DataStore Preferences
-
-- `AppPreferences` — wrapper sobre `DataStore<Preferences>` [source]
-- Guarda preferencias de usuario (tema, etc.)

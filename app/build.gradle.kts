@@ -135,11 +135,8 @@ dependencies {
   // SplashScreen
   implementation(libs.androidx.core.splashscreen)
 
-  // Lottie
+// Lottie
   implementation(libs.lottie.compose)
-
-  // DataStore Preferences
-  implementation(libs.datastore.preferences)
 
   // Room
   implementation(libs.room.runtime)

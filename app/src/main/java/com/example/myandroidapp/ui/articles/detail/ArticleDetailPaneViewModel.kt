@@ -3,7 +3,6 @@ package com.example.myandroidapp.ui.articles.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myandroidapp.analytics.AnalyticsHelper
-import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.data.usecase.GetArticleUseCase
 import com.example.myandroidapp.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +16,6 @@ import javax.inject.Inject
 class ArticleDetailPaneViewModel @Inject constructor(
     private val getArticle: GetArticleUseCase,
     private val analytics: AnalyticsHelper,
-    private val preferences: AppPreferences,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<ArticleDetailState>>(UiState.Loading)
@@ -30,7 +28,6 @@ class ArticleDetailPaneViewModel @Inject constructor(
             getArticle(articleId)
                 .onSuccess { article ->
                     analytics.logEvent("article_loaded", mapOf("id" to article.id.toString()))
-                    viewModelScope.launch { preferences.setLastOpenedArticleId(article.id) }
                     _uiState.value = UiState.Success(ArticleDetailState(article = article))
                 }
                 .onFailure { e ->

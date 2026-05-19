@@ -1,5 +1,14 @@
 # Changelog del Wiki
 
+## 2026-05-19
+
+- Removed `data/preferences/AppPreferences` and `di/DataStoreModule` — no se consumía (`lastOpenedArticleId` sin lectores, `isDarkMode` sin uso)
+  - Updated [[architecture/app-structure]] — removed `DataStoreModule` and `preferences/` directory
+  - Updated [[tools/hilt-setup]] — removed `DataStoreModule` row, updated `AppModule` bindings
+  - Updated [[architecture/di-hierarchy]] — removed `DataStoreModule` row and dependency, updated `AppModule` bindings
+  - Updated [[architecture/data-layer]] — removed DataStore Preferences section
+  - Removed `datastore.preferences` dependency from `build.gradle.kts`
+
 ## 2026-05-18 (2)
 
 - Refactor DualPaneScreen + introducción de `GetArticleUseCase`

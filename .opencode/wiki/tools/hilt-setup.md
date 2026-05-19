@@ -5,7 +5,7 @@ tags:
 
 # Hilt Setup
 
-> **Last verified:** 2026-05-18 | **Verified by:** [source]
+> **Last verified:** 2026-05-19 | **Verified by:** [source] — removed `DataStoreModule`, updated `AppModule` bindings
 
 ## Entries
 
@@ -16,11 +16,10 @@ tags:
 
 | Módulo | Bindings clave |
 |---|---|
-| `AppModule` | `Context`, `DataStore<Preferences>` |
+| `AppModule` | `isDebug` named binding |
 | `NetworkModule` | `OkHttpClient`, `Retrofit`, `ApiService` |
 | `DatabaseModule` | `AppDatabase`, `ArticleDao` |
 | `RepositoryModule` | `ArticlesRepository` |
-| `DataStoreModule` | `AppPreferences` |
 | `DispatcherModule` | `CoroutineDispatchers` |
 | `AnalyticsModule` | `AnalyticsHelper` → `TimberAnalyticsHelper` |
 

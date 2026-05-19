@@ -4,11 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.example.myandroidapp.TestArticleData
 import com.example.myandroidapp.analytics.AnalyticsHelper
 import com.example.myandroidapp.data.usecase.GetArticleUseCase
-import com.example.myandroidapp.data.preferences.AppPreferences
 import com.example.myandroidapp.test.MainDispatcherRule
 import com.example.myandroidapp.ui.UiState
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
@@ -24,7 +22,6 @@ class ArticleDetailViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val analytics = mockk<AnalyticsHelper>(relaxed = true)
-    private val preferences = mockk<AppPreferences>(relaxed = true)
 
     @Test
     fun `initial state is Loading`() {
@@ -33,7 +30,6 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             getArticle = getArticle,
             analytics = analytics,
-            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
 
@@ -48,7 +44,6 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             getArticle = getArticle,
             analytics = analytics,
-            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -67,29 +62,11 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             getArticle = getArticle,
             analytics = analytics,
-            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify { analytics.logEvent("article_loaded", mapOf("id" to "1")) }
-    }
-
-    @Test
-    fun `persists last opened article id on success`() = runTest {
-        val preferences = mockk<AppPreferences>(relaxed = true)
-        val getArticle = mockk<GetArticleUseCase>()
-        coEvery { getArticle(1) } returns Result.success(TestArticleData.articleDetail)
-
-        val viewModel = ArticleDetailViewModel(
-            getArticle = getArticle,
-            analytics = analytics,
-            preferences = preferences,
-            savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
-        )
-        mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
-
-        coVerify { preferences.setLastOpenedArticleId(1) }
     }
 
     @Test
@@ -100,7 +77,6 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             getArticle = getArticle,
             analytics = analytics,
-            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -119,7 +95,6 @@ class ArticleDetailViewModelTest {
         val viewModel = ArticleDetailViewModel(
             getArticle = getArticle,
             analytics = analytics,
-            preferences = preferences,
             savedStateHandle = SavedStateHandle(mapOf("articleId" to 1)),
         )
         mainDispatcherRule.testDispatcher.scheduler.advanceUntilIdle()
@@ -137,7 +112,6 @@ class ArticleDetailViewModelTest {
             ArticleDetailViewModel(
                 getArticle = getArticle,
                 analytics = analytics,
-                preferences = preferences,
                 savedStateHandle = SavedStateHandle(),
             )
         }
